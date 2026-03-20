@@ -102,9 +102,6 @@
       section {
         padding: 7rem 0;
       }
-      #projects {
-        padding-top: 5rem;
-      }
 
       .section-label {
         font-family: var(--mono);
@@ -127,54 +124,64 @@
       /* ── HERO ─────────────────────────────────────────── */
 
       #hero {
-        padding: 6.5rem 0 2.5rem;
-        border-bottom: 1px solid var(--border);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        padding: 6rem 0 7rem;
+        position: relative;
       }
 
-      .hero-top {
-        display: flex;
-        flex-direction: column;
-        gap: 0.4rem;
-        margin-bottom: 0.9rem;
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1fr 260px;
+        gap: 5rem;
+        align-items: center;
+        width: 100%;
+      }
+
+      .hero-eyebrow {
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+        color: var(--mono-color);
+        text-transform: uppercase;
+        margin-bottom: 2rem;
       }
 
       .hero-name {
-        font-size: clamp(1.5rem, 3vw, 2.25rem);
+        font-size: clamp(2.25rem, 5vw, 3.75rem);
         font-weight: 400;
-        line-height: 1.1;
+        line-height: 1.05;
         letter-spacing: -0.02em;
         color: var(--text-primary);
+        margin-bottom: 1.25rem;
       }
 
       .hero-title {
-        font-size: 0.875rem;
-        font-family: var(--mono);
-        letter-spacing: 0.06em;
-        color: var(--mono-color);
-        text-transform: uppercase;
+        font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+        font-weight: 500;
+        color: var(--accent);
+        letter-spacing: 0.01em;
+        margin-bottom: 2rem;
       }
-
-      .hero-bottom {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 2rem;
-        flex-wrap: wrap;
+      .hero-title .amp {
+        color: var(--mono-color);
+        font-size: 0.9em;
       }
 
       .hero-bio {
-        font-size: 0.9375rem;
+        font-size: 1.0625rem;
         color: var(--text-secondary);
-        line-height: 1.75;
-        max-width: 580px;
+        max-width: 520px;
+        line-height: 1.85;
+        margin-bottom: 2.75rem;
       }
 
       .hero-links {
         display: flex;
-        gap: 1.25rem;
+        gap: 1.5rem;
         align-items: center;
         flex-wrap: wrap;
-        flex-shrink: 0;
       }
 
       .btn-primary {
@@ -212,12 +219,66 @@
         border-color: var(--text-secondary);
       }
 
+      /* Hero photo */
+      .hero-photo {
+        width: 100%;
+        aspect-ratio: 3 / 4;
+        border: 1px solid var(--border-2);
+        background: var(--surface);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        filter: grayscale(12%) brightness(0.9);
+      }
+
+      .photo-placeholder {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+      }
+
+      .photo-placeholder svg {
+        width: 52px;
+        height: 52px;
+        opacity: 0.16;
+      }
+
       .photo-placeholder span {
         font-family: var(--mono);
         font-size: 0.5875rem;
         letter-spacing: 0.12em;
         text-transform: uppercase;
         color: var(--text-muted);
+      }
+
+      .hero-scroll {
+        position: absolute;
+        bottom: 2.75rem;
+        left: 2.5rem;
+        font-family: var(--mono);
+        font-size: 0.5875rem;
+        color: var(--mono-color);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 0.875rem;
+      }
+      .hero-scroll::before {
+        content: "";
+        width: 28px;
+        height: 1px;
+        background: var(--mono-color);
       }
 
       /* ── PROJECTS ─────────────────────────────────────── */
@@ -1036,10 +1097,11 @@
       /* ── RESPONSIVE ──────────────────────────────────── */
 
       @media (max-width: 900px) {
-        .hero-bottom {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 1rem;
+        .hero-grid {
+          grid-template-columns: 1fr;
+        }
+        .hero-photo-wrap {
+          display: none;
         }
         nav {
           padding: 1rem 1.5rem;
@@ -1159,22 +1221,68 @@
     <!-- ── HERO ─────────────────────────────────────── -->
     <section id="hero">
       <div class="container">
-        <div class="hero-top">
-          <h1 class="hero-name">Ekaterina Chukina</h1>
-          <span class="hero-title">Technical Designer &amp; Gameplay Programmer</span>
-        </div>
-        <div class="hero-bottom">
-          <p class="hero-bio">
-            I build gameplay systems that ship — enemy AI, weapon frameworks,
-            data-driven authoring tools. Prague, CZ &nbsp;·&nbsp; Open to opportunities
-          </p>
-          <div class="hero-links">
-            <a href="mailto:chukina.eka@gmail.com" class="btn-primary">Get in touch</a>
-            <a href="https://github.com/" target="_blank" rel="noopener" class="btn-ghost">GitHub ↗</a>
-            <a href="https://linkedin.com/" target="_blank" rel="noopener" class="btn-ghost">LinkedIn ↗</a>
+        <div class="hero-grid">
+          <div>
+            <p class="hero-eyebrow">
+              Prague, CZ &nbsp;·&nbsp; Open to opportunities
+            </p>
+            <h1 class="hero-name">Ekaterina<br />Chukina</h1>
+            <p class="hero-title">
+              Technical Designer <span class="amp">&amp;</span> Gameplay Programmer
+            </p>
+            <p class="hero-bio">
+              I build gameplay systems that ship. Focused on the intersection of
+              design and code — from enemy AI and weapon frameworks to
+              data-driven authoring tools that cut production time in half.
+              Comfortable owning features end-to-end.
+            </p>
+            <div class="hero-links">
+              <a href="mailto:chukina.eka@gmail.com" class="btn-primary"
+                >Get in touch</a
+              >
+              <!-- Replace # with your actual URLs -->
+              <a
+                href="https://github.com/"
+                target="_blank"
+                rel="noopener"
+                class="btn-ghost"
+                >GitHub ↗</a
+              >
+              <a
+                href="https://linkedin.com/"
+                target="_blank"
+                rel="noopener"
+                class="btn-ghost"
+                >LinkedIn ↗</a
+              >
+            </div>
+          </div>
+
+          <div class="hero-photo-wrap">
+            <div class="hero-photo">
+              <!--
+              TO ADD YOUR PHOTO:
+              Replace everything inside .hero-photo with:
+              <img src="photo.jpg" alt="Ekaterina Chukina">
+              Recommended: square or portrait crop, JPG or WebP
+            -->
+              <div class="photo-placeholder">
+                <svg
+                  viewBox="0 0 48 48"
+                  fill="none"
+                  stroke="#8c8c8c"
+                  stroke-width="1"
+                >
+                  <circle cx="24" cy="17" r="9" />
+                  <path d="M6 43c0-9.941 8.059-18 18-18s18 8.059 18 18" />
+                </svg>
+                <span>Photo coming soon</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+      <div class="hero-scroll">Scroll</div>
     </section>
 
     <!-- ── PROJECTS — rendered by JS ────────────────── -->
