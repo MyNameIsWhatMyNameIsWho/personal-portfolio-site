@@ -1323,7 +1323,7 @@ Explain the concept, the design decisions, what you implemented and how, any int
     const goal = document.createElement('div');
     goal.className = 'skills-goal';
     wrap.appendChild(goal);
-    let goalX = 0, goalY = 0, scored = 0, goalLocked = false;
+    let goalX = 0, goalY = 0, scored = 0, goalLocked = false, ghostUntil = 0;
 
     function placeGoal() {
       // Try random positions until one isn't buried inside a chip
@@ -1378,7 +1378,7 @@ Explain the concept, the design decisions, what you implemented and how, any int
 
     /* Resolve ball vs one chip — mutates bx/by/vx/vy */
     function resolveChip(d) {
-      if (d.skip) return;
+      if (d.skip || performance.now() < ghostUntil) return;
       const cx = Math.max(d.x, Math.min(bx, d.x + d.w));
       const cy = Math.max(d.y, Math.min(by, d.y + d.h));
       const dx = bx - cx, dy = by - cy;
@@ -1440,21 +1440,27 @@ Explain the concept, the design decisions, what you implemented and how, any int
             d.x = d.origX; d.y = d.origY;
             d.el.style.left = d.x + 'px';
             d.el.style.top  = d.y + 'px';
-            d.skip = true;
+            d.skip = true;  // each chip activates individually once ball clears it
           });
-          // Move ball to a clear spot in the reset layout
-          const [nbx, nby] = findClearBallPos();
-          bx = nbx; by = nby;
-          vx = SPEED * (Math.random() > 0.5 ? 1 : -1);
-          vy = SPEED * 0.8 * (Math.random() > 0.5 ? 1 : -1);
+          ghostUntil = performance.now() + 1500;
           wrap.classList.add('ghosting');
-          setTimeout(() => {
-            wrap.classList.remove('ghosting');
-            chipData.forEach(d => { d.skip = false; });
-          }, 1500);
           placeGoal();
           goalLocked = false;
         }, 900);
+      }
+
+      // Chips are passable while ghosted; activate only after ghost timer expires AND ball has cleared
+      const ghostActive = performance.now() < ghostUntil;
+      if (!ghostActive) {
+        let anySkipped = false;
+        chipData.forEach(d => {
+          if (!d.skip) return;
+          const cx = Math.max(d.x, Math.min(bx, d.x + d.w));
+          const cy = Math.max(d.y, Math.min(by, d.y + d.h));
+          if (Math.hypot(bx - cx, by - cy) > BALL_R + 6) d.skip = false;
+          else anySkipped = true;
+        });
+        if (!anySkipped) wrap.classList.remove('ghosting');
       }
 
       // Gentle decay back toward base speed after hard hits
@@ -1532,8 +1538,6 @@ Explain the concept, the design decisions, what you implemented and how, any int
         d.skip = false;
       });
       wrap.classList.remove('ghosting');
-      scored = 0;
-      document.getElementById('skills-score').textContent = '0 scored';
       placeGoal();
     });
   }
