@@ -1,909 +1,1431 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ekaterina Chukina — Technical Designer</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg:             #22252a;
-      --surface:        #2a2d33;
-      --surface-2:      #32363c;
-      --border:         #3e4249;
-      --border-2:       #52565e;
-      --text-primary:   #ececec;
-      --text-secondary: #8c8c8c;
-      --text-muted:     #4e4e4e;
-      --accent:         #bab2a8;
-      --mono-color:     #7aaec4;
-      --font:           'Oxanium', sans-serif;
-      --mono:           'JetBrains Mono', 'Courier New', monospace;
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--bg);
-      color: var(--text-primary);
-      font-family: var(--font);
-      font-size: 16px;
-      line-height: 1.65;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ── NAV ─────────────────────────────────────────── */
-
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1.25rem 2.5rem;
-      background: rgba(34, 37, 42, 0.93);
-      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .nav-name {
-      font-size: 0.875rem; font-weight: 500; letter-spacing: 0.03em;
-      color: var(--text-primary); text-decoration: none;
-    }
-
-    .nav-links { display: flex; gap: 2.25rem; list-style: none; }
-
-    .nav-links a {
-      font-size: 0.75rem; font-family: var(--mono); letter-spacing: 0.08em;
-      color: var(--mono-color); text-decoration: none; text-transform: uppercase;
-      transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--text-primary); }
-
-    /* ── LAYOUT ──────────────────────────────────────── */
-
-    .container { max-width: 1100px; margin: 0 auto; padding: 0 2.5rem; }
-    section { padding: 7rem 0; }
-
-    .section-label {
-      font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--mono-color); margin-bottom: 3.5rem;
-      display: flex; align-items: center; gap: 1.25rem;
-    }
-    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-    /* ── HERO ─────────────────────────────────────────── */
-
-    #hero {
-      min-height: 100vh; display: flex; align-items: center;
-      padding: 6rem 0 7rem; position: relative;
-    }
-
-    .hero-grid {
-      display: grid; grid-template-columns: 1fr 260px;
-      gap: 5rem; align-items: center; width: 100%;
-    }
-
-    .hero-eyebrow {
-      font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.08em;
-      color: var(--mono-color); text-transform: uppercase; margin-bottom: 2rem;
-    }
-
-    .hero-name {
-      font-size: clamp(3rem, 7vw, 5.5rem); font-weight: 400;
-      line-height: 1.05; letter-spacing: -0.02em;
-      color: var(--text-primary); margin-bottom: 1.25rem;
-    }
-
-    .hero-title {
-      font-size: clamp(1.0625rem, 2.5vw, 1.375rem); font-weight: 400;
-      color: var(--text-secondary); margin-bottom: 2rem;
-    }
-
-    .hero-bio {
-      font-size: 1.0625rem; color: var(--text-secondary);
-      max-width: 520px; line-height: 1.85; margin-bottom: 2.75rem;
-    }
-
-    .hero-links { display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
-
-    .btn-primary {
-      display: inline-flex; align-items: center;
-      font-size: 0.875rem; font-weight: 500; letter-spacing: 0.03em;
-      color: var(--bg); background: var(--text-primary);
-      padding: 0.75rem 1.5rem; text-decoration: none; transition: opacity 0.2s;
-    }
-    .btn-primary:hover { opacity: 0.82; }
-
-    .btn-ghost {
-      display: inline-flex; align-items: center;
-      font-size: 0.8125rem; font-family: var(--mono); letter-spacing: 0.06em;
-      color: var(--text-secondary); text-decoration: none;
-      padding-bottom: 2px; border-bottom: 1px solid var(--border-2);
-      transition: color 0.2s, border-color 0.2s;
-    }
-    .btn-ghost:hover { color: var(--text-primary); border-color: var(--text-secondary); }
-
-    /* Hero photo */
-    .hero-photo {
-      width: 100%; aspect-ratio: 3 / 4;
-      border: 1px solid var(--border-2); background: var(--surface);
-      position: relative; overflow: hidden;
-    }
-
-    .hero-photo img {
-      width: 100%; height: 100%; object-fit: cover; display: block;
-      filter: grayscale(12%) brightness(0.9);
-    }
-
-    .photo-placeholder {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 1rem;
-    }
-
-    .photo-placeholder svg { width: 52px; height: 52px; opacity: 0.16; }
-
-    .photo-placeholder span {
-      font-family: var(--mono); font-size: 0.5875rem;
-      letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted);
-    }
-
-    .hero-scroll {
-      position: absolute; bottom: 2.75rem; left: 2.5rem;
-      font-family: var(--mono); font-size: 0.5875rem;
-      color: var(--text-muted); letter-spacing: 0.14em; text-transform: uppercase;
-      display: flex; align-items: center; gap: 0.875rem;
-    }
-    .hero-scroll::before { content: ''; width: 28px; height: 1px; background: var(--text-muted); }
-
-    /* ── PROJECTS ─────────────────────────────────────── */
-
-    #projects { border-top: 1px solid var(--border); }
-
-    .projects-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 1px; background: var(--border); outline: 1px solid var(--border);
-    }
-
-    .project-card {
-      background: var(--bg); cursor: pointer;
-      transition: background 0.25s;
-      display: flex; flex-direction: column;
-    }
-    .project-card:hover { background: var(--surface); }
-    .project-card:hover .project-title { color: #fff; }
-
-    /* Card thumbnail */
-    .card-thumb {
-      position: relative; aspect-ratio: 16 / 9;
-      overflow: hidden; background: #2d333c; flex-shrink: 0;
-    }
-
-    .card-thumb-bg {
-      position: absolute; inset: 0; pointer-events: none;
-      background: repeating-linear-gradient(
-        -45deg, transparent, transparent 22px,
-        rgba(255,255,255,0.02) 22px, rgba(255,255,255,0.02) 23px
-      );
-    }
-
-    /* card poster image (static thumbnail) */
-    .card-poster {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%; object-fit: cover; display: block;
-      transition: opacity 0.4s;
-    }
-
-    /* card hover video */
-    .card-video {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%; object-fit: cover; display: block;
-      opacity: 0; transition: opacity 0.5s;
-    }
-    .card-video.playing { opacity: 1; }
-
-    /* YouTube hover iframe */
-    .card-yt-frame {
-      position: absolute; inset: -2px;
-      width: calc(100% + 4px); height: calc(100% + 4px);
-      border: none; pointer-events: none;
-      opacity: 0; transition: opacity 0.5s;
-    }
-    .card-yt-frame.visible { opacity: 1; }
-    /* Invisible overlay blocks YT controls from showing / being clicked */
-    .card-yt-shield {
-      position: absolute; inset: 0; z-index: 2;
-      background: transparent; pointer-events: none;
-    }
-    .card-poster { transition: opacity 0.4s; }
-
-    .card-thumb-num {
-      position: absolute; bottom: 0.875rem; left: 1rem;
-      font-family: var(--mono); font-size: 0.5rem; letter-spacing: 0.14em;
-      color: rgba(255,255,255,0.28); pointer-events: none;
-    }
-
-    .card-play-ring {
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 52px; height: 52px; border-radius: 50%;
-      border: 1px solid rgba(235,235,235,0.22);
-      display: flex; align-items: center; justify-content: center;
-      transition: opacity 0.3s; pointer-events: none;
-    }
-    .card-play-ring svg { width: 16px; height: 16px; fill: rgba(235,235,235,0.45); margin-left: 3px; }
-    .project-card:hover .card-play-ring { opacity: 0; }
-
-    /* Card body */
-    .card-body { padding: 1rem 1.375rem 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
-
-    .project-title {
-      font-size: 1.125rem; font-weight: 500; color: var(--text-primary);
-      letter-spacing: -0.01em; line-height: 1.25; margin-bottom: 0;
-      transition: color 0.2s;
-    }
-
-    .project-type {
-      font-family: var(--mono); font-size: 0.6875rem; color: var(--accent);
-      letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0;
-    }
-
-    .project-desc { display: none; }
-
-    .project-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0; }
-
-    .tag {
-      font-family: var(--mono); font-size: 0.6875rem; letter-spacing: 0.04em;
-      color: var(--mono-color); border: 1px solid var(--border-2);
-      padding: 0.25rem 0.625rem;
-    }
-
-    .card-cta {
-      align-self: flex-start;
-      font-family: var(--mono); font-size: 0.6875rem; letter-spacing: 0.06em;
-      text-transform: uppercase; color: var(--mono-color); background: none;
-      border: none; border-bottom: 1px solid var(--border-2); padding: 0 0 1px;
-      cursor: pointer; transition: color 0.2s, border-color 0.2s;
-    }
-    .project-card:hover .card-cta { color: var(--text-primary); border-color: var(--text-secondary); }
-
-    /* ── MODAL ────────────────────────────────────────── */
-
-    #modal {
-      position: fixed; inset: 0; z-index: 200;
-      display: flex; align-items: flex-start; justify-content: center;
-      padding: 2rem;
-      opacity: 0; visibility: hidden; pointer-events: none;
-      overflow-y: auto;
-      transition: opacity 0.3s, visibility 0.3s;
-    }
-    #modal.open { opacity: 1; visibility: visible; pointer-events: auto; }
-
-    .modal-bg {
-      position: fixed; inset: 0; z-index: 0;
-      background: rgba(0,0,0,0.88);
-      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-      cursor: pointer;
-    }
-
-    .modal-panel {
-      position: relative; z-index: 1;
-      background: var(--surface); border: 1px solid var(--border-2);
-      width: 100%; max-width: 900px; margin: auto;
-      transform: translateY(18px);
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    #modal.open .modal-panel { transform: translateY(0); }
-
-    /* Custom scrollbar inside modal */
-    #modal::-webkit-scrollbar { width: 4px; }
-    #modal::-webkit-scrollbar-track { background: transparent; }
-    #modal::-webkit-scrollbar-thumb { background: var(--border-2); }
-
-    .modal-close {
-      position: absolute; top: 1.25rem; right: 1.25rem; z-index: 10;
-      width: 36px; height: 36px;
-      background: var(--surface-2); border: 1px solid var(--border-2);
-      color: var(--text-secondary); font-size: 1.25rem; line-height: 1;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: color 0.2s, background 0.2s;
-    }
-    .modal-close:hover { color: var(--text-primary); background: var(--border); }
-
-    .modal-header { padding: 2.5rem 2.5rem 2rem; }
-
-    .modal-num {
-      font-family: var(--mono); font-size: 0.6875rem; color: var(--text-muted);
-      letter-spacing: 0.08em; margin-bottom: 0.75rem;
-    }
-
-    .modal-title {
-      font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 500; letter-spacing: -0.02em;
-      color: var(--text-primary); margin-bottom: 0.5rem; line-height: 1.15;
-    }
-
-    .modal-type {
-      font-family: var(--mono); font-size: 0.6875rem; color: var(--accent);
-      letter-spacing: 0.1em; text-transform: uppercase;
-    }
-
-    .modal-rule { height: 1px; background: var(--border); margin: 0 2.5rem; }
-
-    /* Modal videos */
-    .modal-videos { padding: 2rem 2.5rem 0; display: flex; flex-direction: column; gap: 2rem; }
-
-    .modal-video-label {
-      font-family: var(--mono); font-size: 0.6875rem; letter-spacing: 0.08em;
-      text-transform: uppercase; color: var(--mono-color);
-      margin-bottom: 0.625rem; display: block;
-    }
-
-    .modal-video-frame {
-      aspect-ratio: 16 / 9; background: #1a1c20;
-      border: 1px solid var(--border); overflow: hidden; position: relative;
-    }
-
-    .modal-video-frame video,
-    .modal-video-frame iframe {
-      width: 100%; height: 100%; display: block; border: none;
-    }
-
-    .modal-video-empty {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 0.625rem;
-      background: repeating-linear-gradient(
-        -45deg, transparent, transparent 22px,
-        rgba(255,255,255,0.02) 22px, rgba(255,255,255,0.02) 23px
-      );
-    }
-
-    .modal-video-empty span {
-      font-family: var(--mono); font-size: 0.6875rem;
-      letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted);
-    }
-
-    .modal-video-empty svg { width: 32px; height: 32px; opacity: 0.18; }
-
-    /* Modal details */
-    .modal-details { padding: 2rem 2.5rem 3rem; }
-
-    .modal-desc {
-      font-size: 1rem; color: var(--text-secondary);
-      line-height: 1.85; margin-bottom: 2rem;
-      white-space: pre-line;
-    }
-
-    .modal-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 2rem; }
-
-    .modal-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
-
-    .modal-links a {
-      font-family: var(--mono); font-size: 0.6875rem; letter-spacing: 0.08em;
-      text-transform: uppercase; color: var(--mono-color); text-decoration: none;
-      padding-bottom: 1px; border-bottom: 1px solid var(--border-2);
-      transition: color 0.2s, border-color 0.2s;
-    }
-    .modal-links a:hover { color: var(--text-primary); border-color: var(--text-secondary); }
-
-    /* ── EXPERIENCE ──────────────────────────────────── */
-
-    #experience { border-top: 1px solid var(--border); }
-
-    /* Tab panel layout */
-    .exp-panel {
-      display: flex; gap: 0; align-items: flex-start;
-      border: 1px solid var(--border);
-    }
-
-    /* Left tab list */
-    .exp-tabs {
-      list-style: none; flex-shrink: 0; width: 220px;
-      border-right: 1px solid var(--border);
-    }
-
-    .exp-tab {
-      padding: 1.375rem 1.5rem; cursor: pointer;
-      border-left: 2px solid transparent;
-      border-bottom: 1px solid var(--border);
-      transition: background 0.18s, border-color 0.18s;
-    }
-    .exp-tab:last-child { border-bottom: none; }
-    .exp-tab:hover { background: var(--surface-2); }
-    .exp-tab.active {
-      border-left-color: var(--mono-color);
-      background: var(--surface-2);
-    }
-
-    .exp-tab-company {
-      display: block; font-size: 0.9375rem; font-weight: 500;
-      color: var(--text-primary); margin-bottom: 0.3rem;
-    }
-    .exp-tab-date {
-      display: block; font-family: var(--mono); font-size: 0.6875rem;
-      color: var(--text-muted); letter-spacing: 0.06em;
-    }
-
-    /* Right detail panel */
-    .exp-details { flex: 1; }
-
-    .exp-detail {
-      display: none; padding: 2.25rem 2.5rem;
-      animation: exp-fade 0.22s ease;
-    }
-    .exp-detail.active { display: block; }
-
-    @keyframes exp-fade {
-      from { opacity: 0; transform: translateY(6px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .exp-role {
-      font-size: 1.25rem; font-weight: 500; color: var(--text-primary);
-      letter-spacing: -0.01em; margin-bottom: 0.3rem;
-    }
-    .exp-company-inline {
-      font-size: 0.9rem; color: var(--mono-color);
-      font-family: var(--mono); margin-bottom: 0.2rem;
-    }
-    .exp-location {
-      font-family: var(--mono); font-size: 0.6875rem; color: var(--text-muted);
-      letter-spacing: 0.04em; margin-bottom: 1.5rem;
-    }
-
-    .exp-bullets { list-style: none; display: flex; flex-direction: column; gap: 0.6875rem; }
-
-    .exp-bullets li {
-      font-size: 1rem; color: var(--text-secondary);
-      line-height: 1.75; padding-left: 1.25rem; position: relative;
-    }
-    .exp-bullets li::before {
-      content: '—'; position: absolute; left: 0;
-      color: var(--text-muted); font-size: 0.75rem; top: 0.18em;
-    }
-
-    /* ── SKILLS ──────────────────────────────────────── */
-
-    #skills { border-top: 1px solid var(--border); }
-
-    .skills-rows {
-      display: flex; flex-direction: column;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .skills-row {
-      display: flex; align-items: flex-start; gap: 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .skills-row:last-child { border-bottom: none; }
-
-    .skills-row-label {
-      flex-shrink: 0; width: 160px;
-      padding: 1.125rem 1.5rem;
-      font-family: var(--mono); font-size: 0.6875rem;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--mono-color);
-      border-right: 1px solid var(--border);
-      display: flex; align-items: center;
-    }
-
-    .skills-row-chips {
-      display: flex; flex-wrap: wrap; gap: 0.5rem;
-      padding: 0.875rem 1.375rem;
-    }
-
-    /* Game controls row */
-    .skills-game-controls {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 1.25rem;
-    }
-    .skills-game-hint {
-      font-family: var(--mono); font-size: 0.6375rem;
-      letter-spacing: 0.08em; color: var(--text-muted);
-    }
-    .skills-reset-btn {
-      font-family: var(--mono); font-size: 0.6375rem; letter-spacing: 0.1em;
-      text-transform: uppercase; padding: 0.3rem 0.875rem;
-      border: 1px solid var(--border); background: none; color: var(--text-muted);
-      cursor: pointer; transition: color 0.2s, border-color 0.2s;
-    }
-    .skills-reset-btn:hover { color: var(--mono-color); border-color: var(--mono-color); }
-
-    /* Game board */
-    .skills-rows {
-      background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
-      background-size: 28px 28px;
-    }
-
-    /* Skill chips */
-    .skill-chip {
-      display: inline-flex; align-items: center;
-      padding: 0.375rem 0.875rem;
-      border: 1px solid var(--border-2);
-      font-size: 0.875rem; color: var(--text-primary);
-      white-space: nowrap; letter-spacing: 0.01em;
-      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-      box-sizing: border-box;
-    }
-    .skill-chip.hit {
-      border-color: var(--mono-color);
-      background: color-mix(in srgb, var(--mono-color) 10%, transparent);
-      box-shadow: 0 0 16px -2px color-mix(in srgb, var(--mono-color) 50%, transparent);
-    }
-    /* Grace period after goal — chips fade out, ball phases through */
-    .skills-rows.ghosting .skill-chip {
-      opacity: 0.15;
-      transition: opacity 0.5s ease !important;
-    }
-    .skills-rows .skill-chip {
-      transition: opacity 0.5s ease, border-color 0.25s, box-shadow 0.25s, background 0.25s;
-    }
-
-    /* Ball */
-    .skills-ball {
-      position: absolute; width: 12px; height: 12px;
-      border-radius: 50%; background: var(--mono-color);
-      box-shadow: 0 0 18px 5px color-mix(in srgb, var(--mono-color) 65%, transparent);
-      pointer-events: none; z-index: 6;
-    }
-
-    /* Goal */
-    .skills-goal {
-      position: absolute; width: 44px; height: 44px; border-radius: 50%;
-      border: 1.5px solid var(--mono-color); pointer-events: none; z-index: 4;
-      animation: goal-pulse 1.6s ease-in-out infinite;
-    }
-    .skills-goal::after {
-      content: ''; position: absolute; inset: 5px; border-radius: 50%;
-      background: color-mix(in srgb, var(--mono-color) 18%, transparent);
-    }
-    @keyframes goal-pulse {
-      0%, 100% { box-shadow: 0 0 0 0   color-mix(in srgb, var(--mono-color) 50%, transparent); }
-      50%       { box-shadow: 0 0 0 10px color-mix(in srgb, var(--mono-color) 0%,  transparent); }
-    }
-    .skills-goal.scored {
-      animation: none;
-      background: color-mix(in srgb, var(--mono-color) 35%, transparent);
-      box-shadow: 0 0 40px 12px color-mix(in srgb, var(--mono-color) 70%, transparent);
-    }
-
-    /* Score counter */
-    #skills-score { color: var(--mono-color); }
-
-    /* ── CONTACT ─────────────────────────────────────── */
-
-    #contact { border-top: 1px solid var(--border); }
-
-    .contact-inner { display: flex; align-items: flex-end; justify-content: space-between; gap: 3rem; }
-
-    .contact-heading {
-      font-size: clamp(2rem, 5vw, 3.75rem); font-weight: 400;
-      color: var(--text-primary); letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 1.25rem;
-    }
-
-    .contact-sub { font-size: 1rem; color: var(--text-secondary); max-width: 360px; line-height: 1.8; }
-
-    .contact-links { display: flex; flex-direction: column; gap: 1rem; align-items: flex-end; flex-shrink: 0; }
-
-    .contact-links a {
-      font-size: 1rem; color: var(--text-secondary); text-decoration: none; transition: color 0.2s;
-    }
-    .contact-links a:hover { color: var(--text-primary); }
-
-    /* ── FOOTER ──────────────────────────────────────── */
-
-    footer {
-      padding: 2rem 2.5rem; border-top: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    footer p { font-family: var(--mono); font-size: 0.6875rem; color: var(--text-muted); letter-spacing: 0.06em; }
-
-    /* ── FADE-UP ─────────────────────────────────────── */
-
-    .fade-up {
-      opacity: 0; transform: translateY(20px);
-      transition: opacity 0.55s ease, transform 0.55s ease;
-    }
-    .fade-up.visible { opacity: 1; transform: translateY(0); }
-
-    /* ── RESPONSIVE ──────────────────────────────────── */
-
-    @media (max-width: 900px) {
-      .hero-grid { grid-template-columns: 1fr; }
-      .hero-photo-wrap { display: none; }
-      nav { padding: 1rem 1.5rem; }
-      .nav-links { gap: 1.5rem; }
-      .container { padding: 0 1.5rem; }
-      section { padding: 5rem 0; }
-      .projects-grid { grid-template-columns: 1fr 1fr; }
-      .exp-panel { flex-direction: column; }
-      .exp-tabs { width: 100%; border-right: none; border-bottom: 1px solid var(--border); display: flex; flex-direction: row; overflow-x: auto; }
-      .exp-tab { border-left: none; border-bottom: 2px solid transparent; border-right: 1px solid var(--border); flex-shrink: 0; }
-      .exp-tab:last-child { border-right: none; }
-      .exp-tab.active { border-bottom-color: var(--mono-color); border-left-color: transparent; }
-      .skills-row { flex-direction: column; }
-      .skills-row-label { width: 100%; border-right: none; border-bottom: 1px solid var(--border); padding: 0.75rem 1.25rem; }
-      .skills-row-chips { padding: 0.75rem 1.25rem; }
-      .contact-inner { flex-direction: column; align-items: flex-start; }
-      .contact-links { align-items: flex-start; }
-    }
-
-    @media (max-width: 540px) {
-      .projects-grid { grid-template-columns: 1fr; }
-      .skills-grid { grid-template-columns: 1fr; }
-      .skill-group { border-right: none !important; border-bottom: 1px solid var(--border) !important; }
-      .skill-group:last-child { border-bottom: none !important; }
-      .hero-links { flex-direction: column; align-items: flex-start; gap: 1rem; }
-      .nav-links { display: none; }
-      #modal { padding: 0; align-items: flex-end; }
-      .modal-panel { width: 100%; }
-      .modal-header, .modal-rule, .modal-videos, .modal-details { padding-left: 1.25rem; padding-right: 1.25rem; }
-      .modal-rule { margin-left: 0; margin-right: 0; }
-    }
-  </style>
-</head>
-<body>
-
-  <!-- ── NAV ──────────────────────────────────────── -->
-  <nav>
-    <a href="#hero" class="nav-name">Ekaterina Chukina</a>
-    <ul class="nav-links">
-      <li><a href="#projects">Projects</a></li>
-      <li><a href="#experience">Experience</a></li>
-      <li><a href="#skills">Skills</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-  </nav>
-
-  <!-- ── HERO ─────────────────────────────────────── -->
-  <section id="hero">
-    <div class="container">
-      <div class="hero-grid">
-
-        <div>
-          <p class="hero-eyebrow">Prague, CZ &nbsp;·&nbsp; Open to opportunities</p>
-          <h1 class="hero-name">Ekaterina<br>Chukina</h1>
-          <p class="hero-title">Technical Designer &amp; Gameplay Programmer</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ekaterina Chukina — Technical Designer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500&family=JetBrains+Mono:wght@400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --bg: #22252a;
+        --surface: #2a2d33;
+        --surface-2: #32363c;
+        --border: #3e4249;
+        --border-2: #52565e;
+        --text-primary: #ececec;
+        --text-secondary: #8c8c8c;
+        --text-muted: #4e4e4e;
+        --accent: #bab2a8;
+        --mono-color: #7aaec4;
+        --font: "Oxanium", sans-serif;
+        --mono: "JetBrains Mono", "Courier New", monospace;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text-primary);
+        font-family: var(--font);
+        font-size: 16px;
+        line-height: 1.65;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ── NAV ─────────────────────────────────────────── */
+
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.25rem 2.5rem;
+        background: rgba(34, 37, 42, 0.93);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .nav-name {
+        font-size: 0.875rem;
+        font-weight: 500;
+        letter-spacing: 0.03em;
+        color: var(--text-primary);
+        text-decoration: none;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 2.25rem;
+        list-style: none;
+      }
+
+      .nav-links a {
+        font-size: 0.75rem;
+        font-family: var(--mono);
+        letter-spacing: 0.08em;
+        color: var(--mono-color);
+        text-decoration: none;
+        text-transform: uppercase;
+        transition: color 0.2s;
+      }
+      .nav-links a:hover {
+        color: var(--text-primary);
+      }
+
+      /* ── LAYOUT ──────────────────────────────────────── */
+
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 2.5rem;
+      }
+      section {
+        padding: 7rem 0;
+      }
+      #projects {
+        padding-top: 5rem;
+      }
+
+      .section-label {
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--mono-color);
+        margin-bottom: 3.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+      }
+      .section-label::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+
+      /* ── HERO ─────────────────────────────────────────── */
+
+      #hero {
+        padding: 6.5rem 0 2.5rem;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .hero-top {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        margin-bottom: 0.9rem;
+      }
+
+      .hero-name {
+        font-size: clamp(1.5rem, 3vw, 2.25rem);
+        font-weight: 400;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        color: var(--text-primary);
+      }
+
+      .hero-title {
+        font-size: 0.875rem;
+        font-family: var(--mono);
+        letter-spacing: 0.06em;
+        color: var(--mono-color);
+        text-transform: uppercase;
+      }
+
+      .hero-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 2rem;
+        flex-wrap: wrap;
+      }
+
+      .hero-bio {
+        font-size: 0.9375rem;
+        color: var(--text-secondary);
+        line-height: 1.75;
+        max-width: 580px;
+      }
+
+      .hero-links {
+        display: flex;
+        gap: 1.25rem;
+        align-items: center;
+        flex-wrap: wrap;
+        flex-shrink: 0;
+      }
+
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.875rem;
+        font-weight: 500;
+        letter-spacing: 0.03em;
+        color: var(--bg);
+        background: var(--text-primary);
+        padding: 0.75rem 1.5rem;
+        text-decoration: none;
+        transition: opacity 0.2s;
+      }
+      .btn-primary:hover {
+        opacity: 0.82;
+      }
+
+      .btn-ghost {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.8125rem;
+        font-family: var(--mono);
+        letter-spacing: 0.06em;
+        color: var(--text-secondary);
+        text-decoration: none;
+        padding-bottom: 2px;
+        border-bottom: 1px solid var(--border-2);
+        transition:
+          color 0.2s,
+          border-color 0.2s;
+      }
+      .btn-ghost:hover {
+        color: var(--text-primary);
+        border-color: var(--text-secondary);
+      }
+
+      .photo-placeholder span {
+        font-family: var(--mono);
+        font-size: 0.5875rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+      }
+
+      /* ── PROJECTS ─────────────────────────────────────── */
+
+      #projects {
+        border-top: 1px solid var(--border);
+      }
+
+      .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        background: var(--border);
+        outline: 1px solid var(--border);
+      }
+
+      .project-card {
+        background: var(--bg);
+        cursor: pointer;
+        transition: background 0.25s;
+        display: flex;
+        flex-direction: column;
+      }
+      .project-card:hover {
+        background: var(--surface);
+      }
+      .project-card:hover .project-title {
+        color: #fff;
+      }
+
+      /* Card thumbnail */
+      .card-thumb {
+        position: relative;
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+        background: #2d333c;
+        flex-shrink: 0;
+      }
+
+      .card-thumb-bg {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: repeating-linear-gradient(
+          -45deg,
+          transparent,
+          transparent 22px,
+          rgba(255, 255, 255, 0.02) 22px,
+          rgba(255, 255, 255, 0.02) 23px
+        );
+      }
+
+      /* card poster image (static thumbnail) */
+      .card-poster {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: opacity 0.4s;
+      }
+
+      /* card hover video */
+      .card-video {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        opacity: 0;
+        transition: opacity 0.5s;
+      }
+      .card-video.playing {
+        opacity: 1;
+      }
+
+      /* YouTube hover iframe */
+      .card-yt-frame {
+        position: absolute;
+        inset: -2px;
+        width: calc(100% + 4px);
+        height: calc(100% + 4px);
+        border: none;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.5s;
+      }
+      .card-yt-frame.visible {
+        opacity: 1;
+      }
+      /* Invisible overlay blocks YT controls from showing / being clicked */
+      .card-yt-shield {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        background: transparent;
+        pointer-events: none;
+      }
+      .card-poster {
+        transition: opacity 0.4s;
+      }
+
+      .card-thumb-num {
+        position: absolute;
+        bottom: 0.875rem;
+        left: 1rem;
+        font-family: var(--mono);
+        font-size: 0.5rem;
+        letter-spacing: 0.14em;
+        color: rgba(255, 255, 255, 0.28);
+        pointer-events: none;
+      }
+
+      .card-play-ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        border: 1px solid rgba(235, 235, 235, 0.22);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.3s;
+        pointer-events: none;
+      }
+      .card-play-ring svg {
+        width: 16px;
+        height: 16px;
+        fill: rgba(235, 235, 235, 0.45);
+        margin-left: 3px;
+      }
+      .project-card:hover .card-play-ring {
+        opacity: 0;
+      }
+
+      /* Card body */
+      .card-body {
+        padding: 1rem 1.375rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .project-title {
+        font-size: 1.125rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        letter-spacing: -0.01em;
+        line-height: 1.25;
+        margin-bottom: 0;
+        transition: color 0.2s;
+      }
+
+      .project-type {
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        color: var(--accent);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 0;
+      }
+
+      .project-desc {
+        display: none;
+      }
+
+      .project-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        margin-bottom: 0;
+      }
+
+      .tag {
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.04em;
+        color: var(--mono-color);
+        border: 1px solid var(--border-2);
+        padding: 0.25rem 0.625rem;
+      }
+
+      .card-cta {
+        align-self: flex-start;
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--mono-color);
+        background: none;
+        border: none;
+        border-bottom: 1px solid var(--border-2);
+        padding: 0 0 1px;
+        cursor: pointer;
+        transition:
+          color 0.2s,
+          border-color 0.2s;
+      }
+      .project-card:hover .card-cta {
+        color: var(--text-primary);
+        border-color: var(--text-secondary);
+      }
+
+      /* ── MODAL ────────────────────────────────────────── */
+
+      #modal {
+        position: fixed;
+        inset: 0;
+        z-index: 200;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 2rem;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        overflow-y: auto;
+        transition:
+          opacity 0.3s,
+          visibility 0.3s;
+      }
+      #modal.open {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+      }
+
+      .modal-bg {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        background: rgba(0, 0, 0, 0.88);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        cursor: pointer;
+      }
+
+      .modal-panel {
+        position: relative;
+        z-index: 1;
+        background: var(--surface);
+        border: 1px solid var(--border-2);
+        width: 100%;
+        max-width: 900px;
+        margin: auto;
+        transform: translateY(18px);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      #modal.open .modal-panel {
+        transform: translateY(0);
+      }
+
+      /* Custom scrollbar inside modal */
+      #modal::-webkit-scrollbar {
+        width: 4px;
+      }
+      #modal::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      #modal::-webkit-scrollbar-thumb {
+        background: var(--border-2);
+      }
+
+      .modal-close {
+        position: absolute;
+        top: 1.25rem;
+        right: 1.25rem;
+        z-index: 10;
+        width: 36px;
+        height: 36px;
+        background: var(--surface-2);
+        border: 1px solid var(--border-2);
+        color: var(--text-secondary);
+        font-size: 1.25rem;
+        line-height: 1;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          color 0.2s,
+          background 0.2s;
+      }
+      .modal-close:hover {
+        color: var(--text-primary);
+        background: var(--border);
+      }
+
+      .modal-header {
+        padding: 2.5rem 2.5rem 2rem;
+      }
+
+      .modal-num {
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        color: var(--text-muted);
+        letter-spacing: 0.08em;
+        margin-bottom: 0.75rem;
+      }
+
+      .modal-title {
+        font-size: clamp(1.75rem, 4vw, 2.5rem);
+        font-weight: 500;
+        letter-spacing: -0.02em;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        line-height: 1.15;
+      }
+
+      .modal-type {
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        color: var(--accent);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .modal-rule {
+        height: 1px;
+        background: var(--border);
+        margin: 0 2.5rem;
+      }
+
+      /* Modal videos */
+      .modal-videos {
+        padding: 2rem 2.5rem 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+
+      .modal-video-label {
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--mono-color);
+        margin-bottom: 0.625rem;
+        display: block;
+      }
+
+      .modal-video-frame {
+        aspect-ratio: 16 / 9;
+        background: #1a1c20;
+        border: 1px solid var(--border);
+        overflow: hidden;
+        position: relative;
+      }
+
+      .modal-video-frame video,
+      .modal-video-frame iframe {
+        width: 100%;
+        height: 100%;
+        display: block;
+        border: none;
+      }
+
+      .modal-video-empty {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.625rem;
+        background: repeating-linear-gradient(
+          -45deg,
+          transparent,
+          transparent 22px,
+          rgba(255, 255, 255, 0.02) 22px,
+          rgba(255, 255, 255, 0.02) 23px
+        );
+      }
+
+      .modal-video-empty span {
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+      }
+
+      .modal-video-empty svg {
+        width: 32px;
+        height: 32px;
+        opacity: 0.18;
+      }
+
+      /* Modal details */
+      .modal-details {
+        padding: 2rem 2.5rem 3rem;
+      }
+
+      .modal-desc {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        line-height: 1.85;
+        margin-bottom: 2rem;
+        white-space: pre-line;
+      }
+
+      .modal-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-bottom: 2rem;
+      }
+
+      .modal-links {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .modal-links a {
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--mono-color);
+        text-decoration: none;
+        padding-bottom: 1px;
+        border-bottom: 1px solid var(--border-2);
+        transition:
+          color 0.2s,
+          border-color 0.2s;
+      }
+      .modal-links a:hover {
+        color: var(--text-primary);
+        border-color: var(--text-secondary);
+      }
+
+      /* ── EXPERIENCE ──────────────────────────────────── */
+
+      #experience {
+        border-top: 1px solid var(--border);
+      }
+
+      /* Tab panel layout */
+      .exp-panel {
+        display: flex;
+        gap: 0;
+        align-items: flex-start;
+        border: 1px solid var(--border);
+      }
+
+      /* Left tab list */
+      .exp-tabs {
+        list-style: none;
+        flex-shrink: 0;
+        width: 220px;
+        border-right: 1px solid var(--border);
+      }
+
+      .exp-tab {
+        padding: 1.375rem 1.5rem;
+        cursor: pointer;
+        border-left: 2px solid transparent;
+        border-bottom: 1px solid var(--border);
+        transition:
+          background 0.18s,
+          border-color 0.18s;
+      }
+      .exp-tab:last-child {
+        border-bottom: none;
+      }
+      .exp-tab:hover {
+        background: var(--surface-2);
+      }
+      .exp-tab.active {
+        border-left-color: var(--mono-color);
+        background: var(--surface-2);
+      }
+
+      .exp-tab-company {
+        display: block;
+        font-size: 0.9375rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        margin-bottom: 0.3rem;
+      }
+      .exp-tab-date {
+        display: block;
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        color: var(--text-muted);
+        letter-spacing: 0.06em;
+      }
+
+      /* Right detail panel */
+      .exp-details {
+        flex: 1;
+      }
+
+      .exp-detail {
+        display: none;
+        padding: 2.25rem 2.5rem;
+        animation: exp-fade 0.22s ease;
+      }
+      .exp-detail.active {
+        display: block;
+      }
+
+      @keyframes exp-fade {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .exp-role {
+        font-size: 1.25rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        letter-spacing: -0.01em;
+        margin-bottom: 0.3rem;
+      }
+      .exp-company-inline {
+        font-size: 0.9rem;
+        color: var(--mono-color);
+        font-family: var(--mono);
+        margin-bottom: 0.2rem;
+      }
+      .exp-location {
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        color: var(--text-muted);
+        letter-spacing: 0.04em;
+        margin-bottom: 1.5rem;
+      }
+
+      .exp-bullets {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0.6875rem;
+      }
+
+      .exp-bullets li {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        line-height: 1.75;
+        padding-left: 1.25rem;
+        position: relative;
+      }
+      .exp-bullets li::before {
+        content: "—";
+        position: absolute;
+        left: 0;
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        top: 0.18em;
+      }
+
+      /* ── SKILLS ──────────────────────────────────────── */
+
+      #skills {
+        border-top: 1px solid var(--border);
+      }
+
+      .skills-rows {
+        display: flex;
+        flex-direction: column;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .skills-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .skills-row:last-child {
+        border-bottom: none;
+      }
+
+      .skills-row-label {
+        flex-shrink: 0;
+        width: 160px;
+        padding: 1.125rem 1.5rem;
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--mono-color);
+        border-right: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+      }
+
+      .skills-row-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0.875rem 1.375rem;
+      }
+
+      /* Game controls row */
+      .skills-game-controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.25rem;
+      }
+      .skills-game-hint {
+        font-family: var(--mono);
+        font-size: 0.6375rem;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+      }
+      .skills-reset-btn {
+        font-family: var(--mono);
+        font-size: 0.6375rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0.3rem 0.875rem;
+        border: 1px solid var(--border);
+        background: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition:
+          color 0.2s,
+          border-color 0.2s;
+      }
+      .skills-reset-btn:hover {
+        color: var(--mono-color);
+        border-color: var(--mono-color);
+      }
+
+      /* Game board */
+      .skills-rows {
+        background-image: radial-gradient(
+          circle,
+          var(--border) 1px,
+          transparent 1px
+        );
+        background-size: 28px 28px;
+      }
+
+      /* Skill chips */
+      .skill-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.375rem 0.875rem;
+        border: 1px solid var(--border-2);
+        font-size: 0.875rem;
+        color: var(--text-primary);
+        white-space: nowrap;
+        letter-spacing: 0.01em;
+        transition:
+          border-color 0.25s ease,
+          box-shadow 0.25s ease,
+          background 0.25s ease;
+        box-sizing: border-box;
+      }
+      .skill-chip.hit {
+        border-color: var(--mono-color);
+        background: color-mix(in srgb, var(--mono-color) 10%, transparent);
+        box-shadow: 0 0 16px -2px
+          color-mix(in srgb, var(--mono-color) 50%, transparent);
+      }
+      /* Grace period after goal — chips fade out, ball phases through */
+      .skills-rows.ghosting .skill-chip {
+        opacity: 0.15;
+        transition: opacity 0.5s ease !important;
+      }
+      .skills-rows .skill-chip {
+        transition:
+          opacity 0.5s ease,
+          border-color 0.25s,
+          box-shadow 0.25s,
+          background 0.25s;
+      }
+
+      /* Ball */
+      .skills-ball {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--mono-color);
+        box-shadow: 0 0 18px 5px
+          color-mix(in srgb, var(--mono-color) 65%, transparent);
+        pointer-events: none;
+        z-index: 6;
+      }
+
+      /* Goal */
+      .skills-goal {
+        position: absolute;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: 1.5px solid var(--mono-color);
+        pointer-events: none;
+        z-index: 4;
+        animation: goal-pulse 1.6s ease-in-out infinite;
+      }
+      .skills-goal::after {
+        content: "";
+        position: absolute;
+        inset: 5px;
+        border-radius: 50%;
+        background: color-mix(in srgb, var(--mono-color) 18%, transparent);
+      }
+      @keyframes goal-pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0
+            color-mix(in srgb, var(--mono-color) 50%, transparent);
+        }
+        50% {
+          box-shadow: 0 0 0 10px
+            color-mix(in srgb, var(--mono-color) 0%, transparent);
+        }
+      }
+      .skills-goal.scored {
+        animation: none;
+        background: color-mix(in srgb, var(--mono-color) 35%, transparent);
+        box-shadow: 0 0 40px 12px
+          color-mix(in srgb, var(--mono-color) 70%, transparent);
+      }
+
+      /* Score counter */
+      #skills-score {
+        color: var(--mono-color);
+      }
+
+      /* ── CONTACT ─────────────────────────────────────── */
+
+      #contact {
+        border-top: 1px solid var(--border);
+      }
+
+      .contact-inner {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 3rem;
+      }
+
+      .contact-heading {
+        font-size: clamp(2rem, 5vw, 3.75rem);
+        font-weight: 400;
+        color: var(--text-primary);
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+        margin-bottom: 1.25rem;
+      }
+
+      .contact-sub {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        max-width: 360px;
+        line-height: 1.8;
+      }
+
+      .contact-links {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-end;
+        flex-shrink: 0;
+      }
+
+      .contact-links a {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .contact-links a:hover {
+        color: var(--text-primary);
+      }
+
+      /* ── FOOTER ──────────────────────────────────────── */
+
+      footer {
+        padding: 2rem 2.5rem;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      footer p {
+        font-family: var(--mono);
+        font-size: 0.6875rem;
+        color: var(--text-muted);
+        letter-spacing: 0.06em;
+      }
+
+      /* ── FADE-UP ─────────────────────────────────────── */
+
+      .fade-up {
+        opacity: 0;
+        transform: translateY(20px);
+        transition:
+          opacity 0.55s ease,
+          transform 0.55s ease;
+      }
+      .fade-up.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ── RESPONSIVE ──────────────────────────────────── */
+
+      @media (max-width: 900px) {
+        .hero-bottom {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 1rem;
+        }
+        nav {
+          padding: 1rem 1.5rem;
+        }
+        .nav-links {
+          gap: 1.5rem;
+        }
+        .container {
+          padding: 0 1.5rem;
+        }
+        section {
+          padding: 5rem 0;
+        }
+        .projects-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .exp-panel {
+          flex-direction: column;
+        }
+        .exp-tabs {
+          width: 100%;
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+          display: flex;
+          flex-direction: row;
+          overflow-x: auto;
+        }
+        .exp-tab {
+          border-left: none;
+          border-bottom: 2px solid transparent;
+          border-right: 1px solid var(--border);
+          flex-shrink: 0;
+        }
+        .exp-tab:last-child {
+          border-right: none;
+        }
+        .exp-tab.active {
+          border-bottom-color: var(--mono-color);
+          border-left-color: transparent;
+        }
+        .skills-row {
+          flex-direction: column;
+        }
+        .skills-row-label {
+          width: 100%;
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+          padding: 0.75rem 1.25rem;
+        }
+        .skills-row-chips {
+          padding: 0.75rem 1.25rem;
+        }
+        .contact-inner {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .contact-links {
+          align-items: flex-start;
+        }
+      }
+
+      @media (max-width: 540px) {
+        .projects-grid {
+          grid-template-columns: 1fr;
+        }
+        .skills-grid {
+          grid-template-columns: 1fr;
+        }
+        .skill-group {
+          border-right: none !important;
+          border-bottom: 1px solid var(--border) !important;
+        }
+        .skill-group:last-child {
+          border-bottom: none !important;
+        }
+        .hero-links {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 1rem;
+        }
+        .nav-links {
+          display: none;
+        }
+        #modal {
+          padding: 0;
+          align-items: flex-end;
+        }
+        .modal-panel {
+          width: 100%;
+        }
+        .modal-header,
+        .modal-rule,
+        .modal-videos,
+        .modal-details {
+          padding-left: 1.25rem;
+          padding-right: 1.25rem;
+        }
+        .modal-rule {
+          margin-left: 0;
+          margin-right: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ── NAV ──────────────────────────────────────── -->
+    <nav>
+      <a href="#hero" class="nav-name">Ekaterina Chukina</a>
+      <ul class="nav-links">
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <!-- ── HERO ─────────────────────────────────────── -->
+    <section id="hero">
+      <div class="container">
+        <div class="hero-top">
+          <h1 class="hero-name">Ekaterina Chukina</h1>
+          <span class="hero-title">Technical Designer &amp; Gameplay Programmer</span>
+        </div>
+        <div class="hero-bottom">
           <p class="hero-bio">
-            I build gameplay systems that ship. Focused on the intersection of design and code —
-            from enemy AI and weapon frameworks to data-driven authoring tools that cut
-            production time in half. Comfortable owning features end-to-end.
+            I build gameplay systems that ship — enemy AI, weapon frameworks,
+            data-driven authoring tools. Prague, CZ &nbsp;·&nbsp; Open to opportunities
           </p>
           <div class="hero-links">
             <a href="mailto:chukina.eka@gmail.com" class="btn-primary">Get in touch</a>
-            <!-- Replace # with your actual URLs -->
             <a href="https://github.com/" target="_blank" rel="noopener" class="btn-ghost">GitHub ↗</a>
             <a href="https://linkedin.com/" target="_blank" rel="noopener" class="btn-ghost">LinkedIn ↗</a>
           </div>
         </div>
+      </div>
+    </section>
 
-        <div class="hero-photo-wrap">
-          <div class="hero-photo">
-            <!--
-              TO ADD YOUR PHOTO:
-              Replace everything inside .hero-photo with:
-              <img src="photo.jpg" alt="Ekaterina Chukina">
-              Recommended: square or portrait crop, JPG or WebP
-            -->
-            <div class="photo-placeholder">
-              <svg viewBox="0 0 48 48" fill="none" stroke="#8c8c8c" stroke-width="1">
-                <circle cx="24" cy="17" r="9"/>
-                <path d="M6 43c0-9.941 8.059-18 18-18s18 8.059 18 18"/>
-              </svg>
-              <span>Photo coming soon</span>
+    <!-- ── PROJECTS — rendered by JS ────────────────── -->
+    <section id="projects">
+      <div class="container">
+        <p class="section-label">01 — Projects</p>
+        <div class="projects-grid" id="projects-grid"></div>
+      </div>
+    </section>
+
+    <!-- ── PROJECT MODAL — populated by JS ──────────── -->
+    <div id="modal" role="dialog" aria-modal="true" aria-hidden="true">
+      <div class="modal-bg" id="modal-bg"></div>
+      <div class="modal-panel">
+        <button class="modal-close" id="modal-close" aria-label="Close">
+          ×
+        </button>
+        <div class="modal-header">
+          <p class="modal-num" id="modal-num"></p>
+          <h2 class="modal-title" id="modal-title"></h2>
+          <p class="modal-type" id="modal-type"></p>
+        </div>
+        <div class="modal-rule"></div>
+        <div class="modal-videos" id="modal-videos"></div>
+        <div class="modal-details">
+          <p class="modal-desc" id="modal-desc"></p>
+          <div class="modal-tags" id="modal-tags"></div>
+          <div class="modal-links" id="modal-links"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── EXPERIENCE ───────────────────────────────── -->
+    <section id="experience">
+      <div class="container">
+        <p class="section-label">02 — Experience</p>
+
+        <div class="exp-panel fade-up">
+          <!-- Left: company list -->
+          <ul class="exp-tabs" role="tablist">
+            <li class="exp-tab active" role="tab" data-exp="0" tabindex="0">
+              <span class="exp-tab-company">Strand Forge</span>
+              <span class="exp-tab-date">2025 — Present</span>
+            </li>
+            <li class="exp-tab" role="tab" data-exp="1" tabindex="0">
+              <span class="exp-tab-company">Bohemia Interactive</span>
+              <span class="exp-tab-date">2024 — 2025</span>
+            </li>
+            <li class="exp-tab" role="tab" data-exp="2" tabindex="0">
+              <span class="exp-tab-company">CTU FEE</span>
+              <span class="exp-tab-date">2023 — 2024</span>
+            </li>
+          </ul>
+
+          <!-- Right: detail panels -->
+          <div class="exp-details">
+            <div class="exp-detail active" id="exp-0" role="tabpanel">
+              <p class="exp-role">Technical Designer / Gameplay Programmer</p>
+              <p class="exp-company-inline">Strand Forge</p>
+              <p class="exp-location">
+                Co-dev partner for Bohemia Interactive &nbsp;·&nbsp; Prague, CZ
+                &nbsp;·&nbsp; Aug 2025 — Present
+              </p>
+              <ul class="exp-bullets">
+                <li>
+                  Building a fast-paced action prototype in Unity: core gameplay
+                  systems, weapon framework, shooting loop for multiple gun
+                  types.
+                </li>
+                <li>
+                  Designing and implementing enemy AI archetypes (chaser /
+                  ranged / tank-AOE) with clear behavior states and
+                  trigger-based activation.
+                </li>
+                <li>
+                  Driving hands-on iteration: playtest feedback → tuning
+                  gameplay feel, readability, and difficulty.
+                </li>
+                <li>
+                  Git-based multi-developer workflow: branches, merges, conflict
+                  resolution.
+                </li>
+              </ul>
+            </div>
+
+            <div class="exp-detail" id="exp-1" role="tabpanel">
+              <p class="exp-role">Junior Technical Designer</p>
+              <p class="exp-company-inline">Bohemia Interactive</p>
+              <p class="exp-location">
+                Prague, CZ &nbsp;·&nbsp; Sep 2024 — Sep 2025
+              </p>
+              <ul class="exp-bullets">
+                <li>
+                  Built reusable gameplay features with proprietary Unity-based
+                  visual scripting tools; shipped across 4 released gameplay
+                  scenarios.
+                </li>
+                <li>
+                  Created a data-driven Quiz system (localization keys +
+                  structured authoring), cutting production time from ~1 week to
+                  2 days.
+                </li>
+                <li>
+                  Developed plug-and-play interaction modules (randomized NPC
+                  dialogue) adopted across multiple adventure scenarios.
+                </li>
+                <li>
+                  QA ticket workflow: RC builds, debugging, behavior alignment,
+                  shipped fixes within sprint constraints.
+                </li>
+              </ul>
+            </div>
+
+            <div class="exp-detail" id="exp-2" role="tabpanel">
+              <p class="exp-role">Unreal Engine Developer / Researcher</p>
+              <p class="exp-company-inline">
+                CTU FEE — Multi-Robot Systems Lab
+              </p>
+              <p class="exp-location">
+                Prague, CZ &nbsp;·&nbsp; Feb 2023 — May 2024
+              </p>
+              <ul class="exp-bullets">
+                <li>
+                  Developed large-scale simulation environments in Unreal Engine
+                  for robotics and drone research.
+                </li>
+                <li>
+                  Implemented frustum culling in C++/Blueprints, improving
+                  rendering efficiency by ~30%.
+                </li>
+              </ul>
             </div>
           </div>
         </div>
-
       </div>
-    </div>
-    <div class="hero-scroll">Scroll</div>
-  </section>
+    </section>
 
-  <!-- ── PROJECTS — rendered by JS ────────────────── -->
-  <section id="projects">
-    <div class="container">
-      <p class="section-label">01 — Projects</p>
-      <div class="projects-grid" id="projects-grid"></div>
-    </div>
-  </section>
-
-  <!-- ── PROJECT MODAL — populated by JS ──────────── -->
-  <div id="modal" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal-bg" id="modal-bg"></div>
-    <div class="modal-panel">
-      <button class="modal-close" id="modal-close" aria-label="Close">×</button>
-      <div class="modal-header">
-        <p class="modal-num" id="modal-num"></p>
-        <h2 class="modal-title" id="modal-title"></h2>
-        <p class="modal-type" id="modal-type"></p>
+    <!-- ── SKILLS ────────────────────────────────────── -->
+    <section id="skills">
+      <div class="container">
+        <p class="section-label">03 — Skills &amp; Tools</p>
+        <div class="skills-game-controls">
+          <span class="skills-game-hint"
+            >drag chips · guide ball to the target &nbsp;·&nbsp;
+            <span id="skills-score">0 scored</span></span
+          >
+          <button class="skills-reset-btn" id="skills-reset">↺ Reset</button>
+        </div>
       </div>
-      <div class="modal-rule"></div>
-      <div class="modal-videos" id="modal-videos"></div>
-      <div class="modal-details">
-        <p class="modal-desc" id="modal-desc"></p>
-        <div class="modal-tags" id="modal-tags"></div>
-        <div class="modal-links" id="modal-links"></div>
-      </div>
-    </div>
-  </div>
 
-  <!-- ── EXPERIENCE ───────────────────────────────── -->
-  <section id="experience">
-    <div class="container">
-      <p class="section-label">02 — Experience</p>
-
-      <div class="exp-panel fade-up">
-
-        <!-- Left: company list -->
-        <ul class="exp-tabs" role="tablist">
-          <li class="exp-tab active" role="tab" data-exp="0" tabindex="0">
-            <span class="exp-tab-company">Strand Forge</span>
-            <span class="exp-tab-date">2025 — Present</span>
-          </li>
-          <li class="exp-tab" role="tab" data-exp="1" tabindex="0">
-            <span class="exp-tab-company">Bohemia Interactive</span>
-            <span class="exp-tab-date">2024 — 2025</span>
-          </li>
-          <li class="exp-tab" role="tab" data-exp="2" tabindex="0">
-            <span class="exp-tab-company">CTU FEE</span>
-            <span class="exp-tab-date">2023 — 2024</span>
-          </li>
-        </ul>
-
-        <!-- Right: detail panels -->
-        <div class="exp-details">
-
-          <div class="exp-detail active" id="exp-0" role="tabpanel">
-            <p class="exp-role">Technical Designer / Gameplay Programmer</p>
-            <p class="exp-company-inline">Strand Forge</p>
-            <p class="exp-location">Co-dev partner for Bohemia Interactive &nbsp;·&nbsp; Prague, CZ &nbsp;·&nbsp; Aug 2025 — Present</p>
-            <ul class="exp-bullets">
-              <li>Building a fast-paced action prototype in Unity: core gameplay systems, weapon framework, shooting loop for multiple gun types.</li>
-              <li>Designing and implementing enemy AI archetypes (chaser / ranged / tank-AOE) with clear behavior states and trigger-based activation.</li>
-              <li>Driving hands-on iteration: playtest feedback → tuning gameplay feel, readability, and difficulty.</li>
-              <li>Git-based multi-developer workflow: branches, merges, conflict resolution.</li>
-            </ul>
+      <div class="container">
+        <div class="skills-rows">
+          <div class="skills-row">
+            <span class="skills-row-label">Engines</span>
+            <div class="skills-row-chips">
+              <span class="skill-chip">Unity</span>
+              <span class="skill-chip">Unreal Engine</span>
+              <span class="skill-chip">Godot</span>
+            </div>
           </div>
 
-          <div class="exp-detail" id="exp-1" role="tabpanel">
-            <p class="exp-role">Junior Technical Designer</p>
-            <p class="exp-company-inline">Bohemia Interactive</p>
-            <p class="exp-location">Prague, CZ &nbsp;·&nbsp; Sep 2024 — Sep 2025</p>
-            <ul class="exp-bullets">
-              <li>Built reusable gameplay features with proprietary Unity-based visual scripting tools; shipped across 4 released gameplay scenarios.</li>
-              <li>Created a data-driven Quiz system (localization keys + structured authoring), cutting production time from ~1 week to 2 days.</li>
-              <li>Developed plug-and-play interaction modules (randomized NPC dialogue) adopted across multiple adventure scenarios.</li>
-              <li>QA ticket workflow: RC builds, debugging, behavior alignment, shipped fixes within sprint constraints.</li>
-            </ul>
+          <div class="skills-row">
+            <span class="skills-row-label">Code</span>
+            <div class="skills-row-chips">
+              <span class="skill-chip">C#</span>
+              <span class="skill-chip">C / C++</span>
+              <span class="skill-chip">Python</span>
+              <span class="skill-chip">Java</span>
+            </div>
           </div>
 
-          <div class="exp-detail" id="exp-2" role="tabpanel">
-            <p class="exp-role">Unreal Engine Developer / Researcher</p>
-            <p class="exp-company-inline">CTU FEE — Multi-Robot Systems Lab</p>
-            <p class="exp-location">Prague, CZ &nbsp;·&nbsp; Feb 2023 — May 2024</p>
-            <ul class="exp-bullets">
-              <li>Developed large-scale simulation environments in Unreal Engine for robotics and drone research.</li>
-              <li>Implemented frustum culling in C++/Blueprints, improving rendering efficiency by ~30%.</li>
-            </ul>
+          <div class="skills-row">
+            <span class="skills-row-label">Technical Design</span>
+            <div class="skills-row-chips">
+              <span class="skill-chip">Gameplay Systems</span>
+              <span class="skill-chip">Visual Scripting</span>
+              <span class="skill-chip">AI / State Machines</span>
+              <span class="skill-chip">Weapon Systems</span>
+              <span class="skill-chip">Authoring Pipelines</span>
+              <span class="skill-chip">Parameter Tuning</span>
+              <span class="skill-chip">Narrative Systems</span>
+              <span class="skill-chip">Data-Driven Design</span>
+              <span class="skill-chip">Prototype Systems</span>
+            </div>
           </div>
 
+          <div class="skills-row">
+            <span class="skills-row-label">Platforms</span>
+            <div class="skills-row-chips">
+              <span class="skill-chip">PC</span>
+              <span class="skill-chip">Meta Quest 3</span>
+              <span class="skill-chip">XR / VR</span>
+              <span class="skill-chip">XR Interaction Toolkit</span>
+            </div>
+          </div>
+
+          <div class="skills-row">
+            <span class="skills-row-label">Process</span>
+            <div class="skills-row-chips">
+              <span class="skill-chip">Git Workflow</span>
+              <span class="skill-chip">QA / RC Builds</span>
+              <span class="skill-chip">Sprint Iteration</span>
+              <span class="skill-chip">Playtest-Driven Tuning</span>
+            </div>
+          </div>
+
+          <div class="skills-row">
+            <span class="skills-row-label">Languages</span>
+            <div class="skills-row-chips">
+              <span class="skill-chip">English — C1</span>
+              <span class="skill-chip">Russian — Native</span>
+              <span class="skill-chip">Czech — B2</span>
+            </div>
+          </div>
         </div>
       </div>
+    </section>
 
-    </div>
-  </section>
-
-  <!-- ── SKILLS ────────────────────────────────────── -->
-  <section id="skills">
-    <div class="container">
-      <p class="section-label">03 — Skills &amp; Tools</p>
-      <div class="skills-game-controls">
-        <span class="skills-game-hint">drag chips · guide ball to the target &nbsp;·&nbsp; <span id="skills-score">0 scored</span></span>
-        <button class="skills-reset-btn" id="skills-reset">↺ Reset</button>
-      </div>
-    </div>
-
-    <div class="container"><div class="skills-rows">
-
-      <div class="skills-row">
-        <span class="skills-row-label">Engines</span>
-        <div class="skills-row-chips">
-          <span class="skill-chip">Unity</span>
-          <span class="skill-chip">Unreal Engine</span>
-          <span class="skill-chip">Godot</span>
+    <!-- ── CONTACT ───────────────────────────────────── -->
+    <section id="contact">
+      <div class="container">
+        <p class="section-label">04 — Contact</p>
+        <div class="contact-inner">
+          <div>
+            <h2 class="contact-heading">Let's work<br />together.</h2>
+            <p class="contact-sub">
+              Open to technical designer and gameplay programmer roles. Based in
+              Prague &nbsp;·&nbsp; open to remote.
+            </p>
+          </div>
+          <div class="contact-links">
+            <a href="mailto:chukina.eka@gmail.com">chukina.eka@gmail.com ↗</a>
+            <a href="https://github.com/" target="_blank" rel="noopener"
+              >GitHub ↗</a
+            >
+            <a href="https://linkedin.com/" target="_blank" rel="noopener"
+              >LinkedIn ↗</a
+            >
+          </div>
         </div>
       </div>
+    </section>
 
-      <div class="skills-row">
-        <span class="skills-row-label">Code</span>
-        <div class="skills-row-chips">
-          <span class="skill-chip">C#</span>
-          <span class="skill-chip">C / C++</span>
-          <span class="skill-chip">Python</span>
-          <span class="skill-chip">Java</span>
-        </div>
-      </div>
+    <!-- ── FOOTER ────────────────────────────────────── -->
+    <footer>
+      <p>© 2026 Ekaterina Chukina</p>
+      <p>Technical Designer · Prague, CZ</p>
+    </footer>
 
-      <div class="skills-row">
-        <span class="skills-row-label">Technical Design</span>
-        <div class="skills-row-chips">
-          <span class="skill-chip">Gameplay Systems</span>
-          <span class="skill-chip">Visual Scripting</span>
-          <span class="skill-chip">AI / State Machines</span>
-          <span class="skill-chip">Weapon Systems</span>
-          <span class="skill-chip">Authoring Pipelines</span>
-          <span class="skill-chip">Parameter Tuning</span>
-          <span class="skill-chip">Narrative Systems</span>
-          <span class="skill-chip">Data-Driven Design</span>
-          <span class="skill-chip">Prototype Systems</span>
-        </div>
-      </div>
-
-      <div class="skills-row">
-        <span class="skills-row-label">Platforms</span>
-        <div class="skills-row-chips">
-          <span class="skill-chip">PC</span>
-          <span class="skill-chip">Meta Quest 3</span>
-          <span class="skill-chip">XR / VR</span>
-          <span class="skill-chip">XR Interaction Toolkit</span>
-        </div>
-      </div>
-
-      <div class="skills-row">
-        <span class="skills-row-label">Process</span>
-        <div class="skills-row-chips">
-          <span class="skill-chip">Git Workflow</span>
-          <span class="skill-chip">QA / RC Builds</span>
-          <span class="skill-chip">Sprint Iteration</span>
-          <span class="skill-chip">Playtest-Driven Tuning</span>
-        </div>
-      </div>
-
-      <div class="skills-row">
-        <span class="skills-row-label">Languages</span>
-        <div class="skills-row-chips">
-          <span class="skill-chip">English — C1</span>
-          <span class="skill-chip">Russian — Native</span>
-          <span class="skill-chip">Czech — B2</span>
-        </div>
-      </div>
-
-    </div></div>
-  </section>
-
-  <!-- ── CONTACT ───────────────────────────────────── -->
-  <section id="contact">
-    <div class="container">
-      <p class="section-label">04 — Contact</p>
-      <div class="contact-inner">
-        <div>
-          <h2 class="contact-heading">Let's work<br>together.</h2>
-          <p class="contact-sub">
-            Open to technical designer and gameplay programmer roles.
-            Based in Prague &nbsp;·&nbsp; open to remote.
-          </p>
-        </div>
-        <div class="contact-links">
-          <a href="mailto:chukina.eka@gmail.com">chukina.eka@gmail.com ↗</a>
-          <a href="https://github.com/" target="_blank" rel="noopener">GitHub ↗</a>
-          <a href="https://linkedin.com/" target="_blank" rel="noopener">LinkedIn ↗</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── FOOTER ────────────────────────────────────── -->
-  <footer>
-    <p>© 2026 Ekaterina Chukina</p>
-    <p>Technical Designer · Prague, CZ</p>
-  </footer>
-
-  <script>
-  /* ═══════════════════════════════════════════════════════════════════
+    <script>
+      /* ═══════════════════════════════════════════════════════════════════
      PROJECT DATA
      ───────────────────────────────────────────────────────────────────
      Edit this array to update your portfolio.
@@ -926,178 +1448,255 @@
        links      — array of { label, href } for the modal
   ═══════════════════════════════════════════════════════════════════ */
 
-  const PROJECTS = [
-
-    // ── 001 ─────────────────────────────────────────────────────────
-    // Current job. Most technically impressive — AI, weapon systems,
-    // gameplay loop. First thing an HR for a TD/GP role should see.
-    {
-      num: '001',
-      title: 'Strand Forge — Action Prototype',
-      type: 'Gameplay Prototype · Ongoing',
-      shortDesc: 'Fast-paced action prototype: weapon framework, multi-type shooting loop, and enemy AI archetypes with state-based behaviors.',
-      fullDesc: `Built at Strand Forge as technical designer and gameplay programmer, co-developing with Bohemia Interactive.
+      const PROJECTS = [
+        // ── 001 ─────────────────────────────────────────────────────────
+        // Current job. Most technically impressive — AI, weapon systems,
+        // gameplay loop. First thing an HR for a TD/GP role should see.
+        {
+          num: "001",
+          title: "Strand Forge — Action Prototype",
+          type: "Gameplay Prototype · Ongoing",
+          shortDesc:
+            "Fast-paced action prototype: weapon framework, multi-type shooting loop, and enemy AI archetypes with state-based behaviors.",
+          fullDesc: `Built at Strand Forge as technical designer and gameplay programmer, co-developing with Bohemia Interactive.
 
 I own the core gameplay systems end-to-end: a weapon framework supporting multiple gun types, a responsive shooting loop tuned for feel, and three enemy AI archetypes — chaser, ranged, and tank-AOE — each with trigger-based activation, clear state machines, and distinct behavior profiles.
 
 Iterated continuously from playtest feedback: tuning combat feel, readability, difficulty curve, and AI response to player actions.
 Working in a multi-developer Git workflow throughout.`,
-      tags: ['Unity', 'C#', 'AI / State Machines', 'Weapon Systems', 'Gameplay Design', '2025–Present'],
-      videos: [
-        // src: local file path e.g. "media/sf_shooting.mp4"
-        // embed: YouTube e.g. "https://www.youtube.com/embed/VIDEO_ID"
-        // poster: thumbnail e.g. "media/sf_thumb.jpg"
-        { label: 'Shooting loop & weapon framework', src: '', embed: 'https://www.youtube.com/embed/aqz-KE-bpKQ', poster: '' },
-        { label: 'Enemy AI — chaser archetype', src: '', embed: '', poster: '' },
-        { label: 'Enemy AI — ranged & tank-AOE', src: '', embed: '', poster: '' },
-      ],
-      links: [],
-    },
+          tags: [
+            "Unity",
+            "C#",
+            "AI / State Machines",
+            "Weapon Systems",
+            "Gameplay Design",
+            "2025–Present",
+          ],
+          videos: [
+            // src: local file path e.g. "media/sf_shooting.mp4"
+            // embed: YouTube e.g. "https://www.youtube.com/embed/VIDEO_ID"
+            // poster: thumbnail e.g. "media/sf_thumb.jpg"
+            {
+              label: "Shooting loop & weapon framework",
+              src: "",
+              embed: "https://www.youtube.com/embed/aqz-KE-bpKQ",
+              poster: "",
+            },
+            {
+              label: "Enemy AI — chaser archetype",
+              src: "",
+              embed: "",
+              poster: "",
+            },
+            {
+              label: "Enemy AI — ranged & tank-AOE",
+              src: "",
+              embed: "",
+              poster: "",
+            },
+          ],
+          links: [],
+        },
 
-    // ── 002 ─────────────────────────────────────────────────────────
-    // Shipped work at a real studio. Shows authoring pipeline skills
-    // and measurable impact (1 week → 2 days).
-    {
-      num: '002',
-      title: 'Bohemia Interactive — Designer Tools',
-      type: 'Authoring Tools · Shipped',
-      shortDesc: 'Reusable gameplay modules and data-driven authoring pipelines built with proprietary Unity-based visual scripting; shipped across 4 released scenarios.',
-      fullDesc: `Built during my year at Bohemia Interactive as Junior Technical Designer.
+        // ── 002 ─────────────────────────────────────────────────────────
+        // Shipped work at a real studio. Shows authoring pipeline skills
+        // and measurable impact (1 week → 2 days).
+        {
+          num: "002",
+          title: "Bohemia Interactive — Designer Tools",
+          type: "Authoring Tools · Shipped",
+          shortDesc:
+            "Reusable gameplay modules and data-driven authoring pipelines built with proprietary Unity-based visual scripting; shipped across 4 released scenarios.",
+          fullDesc: `Built during my year at Bohemia Interactive as Junior Technical Designer.
 
 Core deliverable: a data-driven Quiz system using localization keys and structured authoring that reduced content production time from ~1 week to 2 days. The system is fully designer-facing — no code changes required to add or modify quiz content.
 
 I also built plug-and-play NPC dialogue interaction modules (randomized responses, state-based triggers) that were adopted across multiple adventure scenarios without modification.
 
 The videos below show the tools and scripted mechanics in action — lesson walkthroughs and gameplay systems I designed and implemented.`,
-      tags: ['Unity', 'Visual Scripting', 'Gameplay Systems', 'Authoring Pipeline', 'Localization', '2024–2025'],
-      videos: [
-        { label: 'Quiz system — walkthrough', src: '', embed: 'https://www.youtube.com/embed/wX6qQoUMBFk', poster: '' },
-        { label: 'NPC dialogue module', src: '', embed: '', poster: '' },
-        { label: 'Shipped mechanic — scenario demo', src: '', embed: '', poster: '' },
-      ],
-      links: [],
-    },
+          tags: [
+            "Unity",
+            "Visual Scripting",
+            "Gameplay Systems",
+            "Authoring Pipeline",
+            "Localization",
+            "2024–2025",
+          ],
+          videos: [
+            {
+              label: "Quiz system — walkthrough",
+              src: "",
+              embed: "https://www.youtube.com/embed/wX6qQoUMBFk",
+              poster: "",
+            },
+            { label: "NPC dialogue module", src: "", embed: "", poster: "" },
+            {
+              label: "Shipped mechanic — scenario demo",
+              src: "",
+              embed: "",
+              poster: "",
+            },
+          ],
+          links: [],
+        },
 
-    // ── 003 ─────────────────────────────────────────────────────────
-    // Solo personal project — shows design thinking and scope control.
-    {
-      num: '003',
-      title: 'Balcony',
-      type: 'Narrative Game · Solo',
-      shortDesc: 'Short narrative game with state-based narration and multiple endings driven by player choices.',
-      fullDesc: `Short narrative game built solo in Godot 4.1.
+        // ── 003 ─────────────────────────────────────────────────────────
+        // Solo personal project — shows design thinking and scope control.
+        {
+          num: "003",
+          title: "Balcony",
+          type: "Narrative Game · Solo",
+          shortDesc:
+            "Short narrative game with state-based narration and multiple endings driven by player choices.",
+          fullDesc: `Short narrative game built solo in Godot 4.1.
 
 I designed a data-driven vignette system — windows, choices, memory fragments — that separates content from logic, making it easy to add or rework story branches without touching the underlying systems. The structure enforces scope control and enables fast iteration.
 
 The game features multiple distinct endings driven entirely by accumulated player state rather than a simple flag system.`,
-      tags: ['Godot 4.1', 'GDScript', 'Narrative Systems', 'Data-Driven Design', 'Solo', '2026'],
-      videos: [
-        { label: 'Gameplay walkthrough', src: '', embed: 'https://www.youtube.com/embed/eRsGyueVLvQ', poster: '' },
-      ],
-      links: [
-        { label: 'Play ↗', href: '#' },
-        { label: 'GitHub ↗', href: '#' },
-      ],
-    },
+          tags: [
+            "Godot 4.1",
+            "GDScript",
+            "Narrative Systems",
+            "Data-Driven Design",
+            "Solo",
+            "2026",
+          ],
+          videos: [
+            {
+              label: "Gameplay walkthrough",
+              src: "",
+              embed: "https://www.youtube.com/embed/eRsGyueVLvQ",
+              poster: "",
+            },
+          ],
+          links: [
+            { label: "Play ↗", href: "#" },
+            { label: "GitHub ↗", href: "#" },
+          ],
+        },
 
-    // ── 004 ─────────────────────────────────────────────────────────
-    // Bachelor thesis — shows C# programming depth and real-user testing.
-    {
-      num: '004',
-      title: 'VR App for Lying Patients',
-      type: 'VR Application · Bachelor Thesis',
-      shortDesc: 'Extended a Unity VR application; designed two original mini-games with audio tutorials, tested with real patients.',
-      fullDesc: `Extended and refactored an existing Unity VR application for Meta Quest 3, designed specifically for patients who cannot sit or stand.
+        // ── 004 ─────────────────────────────────────────────────────────
+        // Bachelor thesis — shows C# programming depth and real-user testing.
+        {
+          num: "004",
+          title: "VR App for Lying Patients",
+          type: "VR Application · Bachelor Thesis",
+          shortDesc:
+            "Extended a Unity VR application; designed two original mini-games with audio tutorials, tested with real patients.",
+          fullDesc: `Extended and refactored an existing Unity VR application for Meta Quest 3, designed specifically for patients who cannot sit or stand.
 
 I built two original mini-games from scratch, each with full audio tutorial narration to guide patients with no prior VR experience. Implemented all interaction systems and accessibility features in C#, using XR Interaction Toolkit.
 
 The application was tested iteratively with real users — feedback directly shaped the final control scheme and pacing. Source code published on GitHub.`,
-      tags: ['Unity', 'C#', 'Meta Quest 3', 'XR Interaction Toolkit', 'Accessibility', '2025'],
-      videos: [
-        { label: 'Mini-game demo', src: '', embed: 'https://www.youtube.com/embed/R6MlUcmOul8', poster: '' },
-        { label: 'Interaction systems overview', src: '', embed: '', poster: '' },
-      ],
-      links: [
-        { label: 'GitHub ↗', href: '#' },
-      ],
-    },
+          tags: [
+            "Unity",
+            "C#",
+            "Meta Quest 3",
+            "XR Interaction Toolkit",
+            "Accessibility",
+            "2025",
+          ],
+          videos: [
+            {
+              label: "Mini-game demo",
+              src: "",
+              embed: "https://www.youtube.com/embed/R6MlUcmOul8",
+              poster: "",
+            },
+            {
+              label: "Interaction systems overview",
+              src: "",
+              embed: "",
+              poster: "",
+            },
+          ],
+          links: [{ label: "GitHub ↗", href: "#" }],
+        },
 
-    // ── 005 ─────────────────────────────────────────────────────────
-    // Fill in with your first indie minigame
-    {
-      num: '005',
-      title: '[Indie Minigame I]',
-      type: 'Indie Game',
-      shortDesc: '[Short description — core mechanic, what makes it fun, what you are proud of.]',
-      fullDesc: `[Longer description for the modal.
-
-Explain the concept, the design decisions, what you implemented and how, any interesting technical challenges or constraints you worked within.]`,
-      tags: ['[Engine]', '[Year]'],
-      videos: [
-        { label: 'Gameplay demo', src: '', embed: 'https://www.youtube.com/embed/Y-rmzh0PI3c', poster: '' },
-      ],
-      links: [
-        { label: 'Play ↗', href: '#' },
-      ],
-    },
-
-    // ── 006 ─────────────────────────────────────────────────────────
-    // Fill in with your second indie minigame
-    {
-      num: '006',
-      title: '[Indie Minigame II]',
-      type: 'Indie Game',
-      shortDesc: '[Short description — core mechanic, what makes it fun, what you are proud of.]',
-      fullDesc: `[Longer description for the modal.
+        // ── 005 ─────────────────────────────────────────────────────────
+        // Fill in with your first indie minigame
+        {
+          num: "005",
+          title: "[Indie Minigame I]",
+          type: "Indie Game",
+          shortDesc:
+            "[Short description — core mechanic, what makes it fun, what you are proud of.]",
+          fullDesc: `[Longer description for the modal.
 
 Explain the concept, the design decisions, what you implemented and how, any interesting technical challenges or constraints you worked within.]`,
-      tags: ['[Engine]', '[Year]'],
-      videos: [
-        { label: 'Gameplay demo', src: '', embed: 'https://www.youtube.com/embed/UXqq0ZvbOnk', poster: '' },
-      ],
-      links: [
-        { label: 'Play ↗', href: '#' },
-      ],
-    },
+          tags: ["[Engine]", "[Year]"],
+          videos: [
+            {
+              label: "Gameplay demo",
+              src: "",
+              embed: "https://www.youtube.com/embed/Y-rmzh0PI3c",
+              poster: "",
+            },
+          ],
+          links: [{ label: "Play ↗", href: "#" }],
+        },
 
-  ];
+        // ── 006 ─────────────────────────────────────────────────────────
+        // Fill in with your second indie minigame
+        {
+          num: "006",
+          title: "[Indie Minigame II]",
+          type: "Indie Game",
+          shortDesc:
+            "[Short description — core mechanic, what makes it fun, what you are proud of.]",
+          fullDesc: `[Longer description for the modal.
 
-  /* ═══════════════════════════════════════════════════════════════════
+Explain the concept, the design decisions, what you implemented and how, any interesting technical challenges or constraints you worked within.]`,
+          tags: ["[Engine]", "[Year]"],
+          videos: [
+            {
+              label: "Gameplay demo",
+              src: "",
+              embed: "https://www.youtube.com/embed/UXqq0ZvbOnk",
+              poster: "",
+            },
+          ],
+          links: [{ label: "Play ↗", href: "#" }],
+        },
+      ];
+
+      /* ═══════════════════════════════════════════════════════════════════
      RENDER PROJECT CARDS
   ═══════════════════════════════════════════════════════════════════ */
 
-  /* Extract YouTube video ID from an embed URL */
-  function getYtId(url) {
-    if (!url) return null;
-    const m = url.match(/embed\/([^?&]+)/);
-    return m ? m[1] : null;
-  }
+      /* Extract YouTube video ID from an embed URL */
+      function getYtId(url) {
+        if (!url) return null;
+        const m = url.match(/embed\/([^?&]+)/);
+        return m ? m[1] : null;
+      }
 
-  /* YouTube thumbnail URL from video ID */
-  function ytThumb(id) {
-    return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
-  }
+      /* YouTube thumbnail URL from video ID */
+      function ytThumb(id) {
+        return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
+      }
 
-  function renderCards() {
-    const grid = document.getElementById('projects-grid');
-    grid.innerHTML = PROJECTS.map((p, i) => {
-      const v0    = p.videos[0] || {};
-      const ytId  = getYtId(v0.embed);
-      const thumb = ytId ? ytThumb(ytId) : v0.poster;
+      function renderCards() {
+        const grid = document.getElementById("projects-grid");
+        grid.innerHTML = PROJECTS.map((p, i) => {
+          const v0 = p.videos[0] || {};
+          const ytId = getYtId(v0.embed);
+          const thumb = ytId ? ytThumb(ytId) : v0.poster;
 
-      const posterEl = thumb
-        ? `<img class="card-poster" src="${thumb}" alt="${p.title} preview" loading="lazy">`
-        : '';
+          const posterEl = thumb
+            ? `<img class="card-poster" src="${thumb}" alt="${p.title} preview" loading="lazy">`
+            : "";
 
-      // Local mp4 fallback (only used if no YouTube embed)
-      const videoEl = v0.src && !ytId
-        ? `<video class="card-video" src="${v0.src}"
-             ${v0.poster ? `poster="${v0.poster}"` : ''}
+          // Local mp4 fallback (only used if no YouTube embed)
+          const videoEl =
+            v0.src && !ytId
+              ? `<video class="card-video" src="${v0.src}"
+             ${v0.poster ? `poster="${v0.poster}"` : ""}
              muted loop playsinline preload="none"></video>`
-        : '';
+              : "";
 
-      return `
-        <div class="project-card fade-up" data-index="${i}" data-ytid="${ytId || ''}"
+          return `
+        <div class="project-card fade-up" data-index="${i}" data-ytid="${ytId || ""}"
              style="transition-delay: ${(i % 3) * 80}ms"
              role="button" tabindex="0" aria-label="Open ${p.title}">
           <div class="card-thumb">
@@ -1114,467 +1713,632 @@ Explain the concept, the design decisions, what you implemented and how, any int
             <h3 class="project-title">${p.title}</h3>
             <p class="project-type">${p.type}</p>
             <div class="project-tags">
-              ${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+              ${p.tags.map((t) => `<span class="tag">${t}</span>`).join("")}
             </div>
             <button class="card-cta">View project →</button>
           </div>
         </div>`;
-    }).join('');
-  }
+        }).join("");
+      }
 
-  /* ═══════════════════════════════════════════════════════════════════
+      /* ═══════════════════════════════════════════════════════════════════
      MODAL
   ═══════════════════════════════════════════════════════════════════ */
 
-  function openModal(index) {
-    const p = PROJECTS[index];
-    const modal = document.getElementById('modal');
+      function openModal(index) {
+        const p = PROJECTS[index];
+        const modal = document.getElementById("modal");
 
-    document.getElementById('modal-num').textContent   = p.num;
-    document.getElementById('modal-title').textContent = p.title;
-    document.getElementById('modal-type').textContent  = p.type;
-    document.getElementById('modal-desc').textContent  = p.fullDesc;
+        document.getElementById("modal-num").textContent = p.num;
+        document.getElementById("modal-title").textContent = p.title;
+        document.getElementById("modal-type").textContent = p.type;
+        document.getElementById("modal-desc").textContent = p.fullDesc;
 
-    document.getElementById('modal-tags').innerHTML =
-      p.tags.map(t => `<span class="tag">${t}</span>`).join('');
+        document.getElementById("modal-tags").innerHTML = p.tags
+          .map((t) => `<span class="tag">${t}</span>`)
+          .join("");
 
-    document.getElementById('modal-links').innerHTML =
-      p.links.length
-        ? p.links.map(l =>
-            `<a href="${l.href}" target="_blank" rel="noopener">${l.label}</a>`
-          ).join('')
-        : '';
+        document.getElementById("modal-links").innerHTML = p.links.length
+          ? p.links
+              .map(
+                (l) =>
+                  `<a href="${l.href}" target="_blank" rel="noopener">${l.label}</a>`,
+              )
+              .join("")
+          : "";
 
-    document.getElementById('modal-videos').innerHTML = p.videos.map((v, vi) => {
-      let content;
-      if (v.embed) {
-        // First video autoplays; the rest load on demand
-        const autoplay = vi === 0 ? '&autoplay=1' : '';
-        const url = v.embed + (v.embed.includes('?') ? '&' : '?')
-          + `rel=0&modestbranding=1${autoplay}`;
-        content = `<iframe src="${url}" frameborder="0" allowfullscreen
+        document.getElementById("modal-videos").innerHTML = p.videos
+          .map((v, vi) => {
+            let content;
+            if (v.embed) {
+              // First video autoplays; the rest load on demand
+              const autoplay = vi === 0 ? "&autoplay=1" : "";
+              const url =
+                v.embed +
+                (v.embed.includes("?") ? "&" : "?") +
+                `rel=0&modestbranding=1${autoplay}`;
+              content = `<iframe src="${url}" frameborder="0" allowfullscreen
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
         </iframe>`;
-      } else if (v.src) {
-        content = `<video src="${v.src}"
-          ${v.poster ? `poster="${v.poster}"` : ''} controls></video>`;
-      } else {
-        content = `<div class="modal-video-empty">
+            } else if (v.src) {
+              content = `<video src="${v.src}"
+          ${v.poster ? `poster="${v.poster}"` : ""} controls></video>`;
+            } else {
+              content = `<div class="modal-video-empty">
           <svg viewBox="0 0 48 28" fill="none" stroke="#4e4e4e" stroke-width="1">
             <rect x="1" y="1" width="46" height="26" rx="1"/>
             <polygon points="18,7 34,14 18,21" fill="#4e4e4e" stroke="none"/>
           </svg>
           <span>Video coming soon</span>
         </div>`;
-      }
-      return `<div>
+            }
+            return `<div>
         <span class="modal-video-label">${v.label}</span>
         <div class="modal-video-frame">${content}</div>
       </div>`;
-    }).join('');
+          })
+          .join("");
 
-    modal.setAttribute('aria-hidden', 'false');
-    modal.classList.add('open');
-    modal.scrollTop = 0;
-    document.body.style.overflow = 'hidden';
-  }
+        modal.setAttribute("aria-hidden", "false");
+        modal.classList.add("open");
+        modal.scrollTop = 0;
+        document.body.style.overflow = "hidden";
+      }
 
-  function closeModal() {
-    const modal = document.getElementById('modal');
-    modal.classList.remove('open');
-    modal.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-    // Stop any playing videos / iframes
-    modal.querySelectorAll('video').forEach(v => v.pause());
-    modal.querySelectorAll('iframe').forEach(f => {
-      // Reset src to stop playback
-      const src = f.src; f.src = ''; f.src = src;
-    });
-  }
+      function closeModal() {
+        const modal = document.getElementById("modal");
+        modal.classList.remove("open");
+        modal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+        // Stop any playing videos / iframes
+        modal.querySelectorAll("video").forEach((v) => v.pause());
+        modal.querySelectorAll("iframe").forEach((f) => {
+          // Reset src to stop playback
+          const src = f.src;
+          f.src = "";
+          f.src = src;
+        });
+      }
 
-  /* ═══════════════════════════════════════════════════════════════════
+      /* ═══════════════════════════════════════════════════════════════════
      CARD INTERACTIONS — hover video + click to open
   ═══════════════════════════════════════════════════════════════════ */
 
-  function setupCards() {
-    document.querySelectorAll('.project-card').forEach((card, i) => {
-      const ytId  = card.dataset.ytid;
-      const thumb = card.querySelector('.card-thumb');
-      const poster = card.querySelector('.card-poster');
-      const video  = card.querySelector('.card-video');
+      function setupCards() {
+        document.querySelectorAll(".project-card").forEach((card, i) => {
+          const ytId = card.dataset.ytid;
+          const thumb = card.querySelector(".card-thumb");
+          const poster = card.querySelector(".card-poster");
+          const video = card.querySelector(".card-video");
 
-      if (ytId) {
-        // ── YouTube hover: inject muted autoplay iframe ──
-        card.addEventListener('mouseenter', () => {
-          if (thumb.querySelector('.card-yt-frame')) return; // already injected
-          const iframe = document.createElement('iframe');
-          iframe.className = 'card-yt-frame';
-          iframe.allow = 'autoplay';
-          iframe.setAttribute('frameborder', '0');
-          // Start muted + autoplay; controls=0 hides UI clutter in preview
-          iframe.src = `https://www.youtube.com/embed/${ytId}`
-            + `?autoplay=1&mute=1&loop=1&playlist=${ytId}`
-            + `&rel=0&modestbranding=1`;
-          thumb.appendChild(iframe);
-          // Fade in after a tick so CSS transition fires
-          requestAnimationFrame(() =>
-            requestAnimationFrame(() => iframe.classList.add('visible'))
-          );
-          if (poster) poster.style.opacity = '0';
+          if (ytId) {
+            // ── YouTube hover: inject muted autoplay iframe ──
+            card.addEventListener("mouseenter", () => {
+              if (thumb.querySelector(".card-yt-frame")) return; // already injected
+              const iframe = document.createElement("iframe");
+              iframe.className = "card-yt-frame";
+              iframe.allow = "autoplay";
+              iframe.setAttribute("frameborder", "0");
+              // Start muted + autoplay; controls=0 hides UI clutter in preview
+              iframe.src =
+                `https://www.youtube.com/embed/${ytId}` +
+                `?autoplay=1&mute=1&loop=1&playlist=${ytId}` +
+                `&rel=0&modestbranding=1`;
+              thumb.appendChild(iframe);
+              // Fade in after a tick so CSS transition fires
+              requestAnimationFrame(() =>
+                requestAnimationFrame(() => iframe.classList.add("visible")),
+              );
+              if (poster) poster.style.opacity = "0";
+            });
+
+            card.addEventListener("mouseleave", () => {
+              const iframe = thumb.querySelector(".card-yt-frame");
+              if (iframe) iframe.remove();
+              if (poster) poster.style.opacity = "1";
+            });
+          } else if (video) {
+            // ── Local mp4 hover ──
+            card.addEventListener("mouseenter", () => {
+              video
+                .play()
+                .then(() => video.classList.add("playing"))
+                .catch(() => {});
+            });
+            card.addEventListener("mouseleave", () => {
+              video.pause();
+              video.currentTime = 0;
+              video.classList.remove("playing");
+            });
+          }
+
+          // Click / keyboard: open modal
+          card.addEventListener("click", () => openModal(i));
+          card.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openModal(i);
+            }
+          });
         });
 
-        card.addEventListener('mouseleave', () => {
-          const iframe = thumb.querySelector('.card-yt-frame');
-          if (iframe) iframe.remove();
-          if (poster) poster.style.opacity = '1';
-        });
-
-      } else if (video) {
-        // ── Local mp4 hover ──
-        card.addEventListener('mouseenter', () => {
-          video.play()
-            .then(() => video.classList.add('playing'))
-            .catch(() => {});
-        });
-        card.addEventListener('mouseleave', () => {
-          video.pause();
-          video.currentTime = 0;
-          video.classList.remove('playing');
+        document
+          .getElementById("modal-close")
+          .addEventListener("click", closeModal);
+        document
+          .getElementById("modal-bg")
+          .addEventListener("click", closeModal);
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") closeModal();
         });
       }
 
-      // Click / keyboard: open modal
-      card.addEventListener('click', () => openModal(i));
-      card.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(i); }
-      });
-    });
-
-    document.getElementById('modal-close').addEventListener('click', closeModal);
-    document.getElementById('modal-bg').addEventListener('click', closeModal);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-  }
-
-  /* ═══════════════════════════════════════════════════════════════════
+      /* ═══════════════════════════════════════════════════════════════════
      SCROLL ANIMATIONS
   ═══════════════════════════════════════════════════════════════════ */
 
-  function setupScrollAnimations() {
-    const observer = new IntersectionObserver(
-      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
-      { threshold: 0.06, rootMargin: '0px 0px -28px 0px' }
-    );
-    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
-  }
+      function setupScrollAnimations() {
+        const observer = new IntersectionObserver(
+          (entries) =>
+            entries.forEach((e) => {
+              if (e.isIntersecting) e.target.classList.add("visible");
+            }),
+          { threshold: 0.06, rootMargin: "0px 0px -28px 0px" },
+        );
+        document
+          .querySelectorAll(".fade-up")
+          .forEach((el) => observer.observe(el));
+      }
 
-  /* ═══════════════════════════════════════════════════════════════════
+      /* ═══════════════════════════════════════════════════════════════════
      SKILLS — bouncing ball puzzle game
   ═══════════════════════════════════════════════════════════════════ */
 
-  function setupSkillsAnimation() {
-    const wrap = document.querySelector('.skills-rows');
-    if (!wrap) return;
+      function setupSkillsAnimation() {
+        const wrap = document.querySelector(".skills-rows");
+        if (!wrap) return;
 
-    const BALL_R = 6, SPEED = 2.6, GOAL_R = 22, SUBSTEPS = 3;
+        const BALL_R = 6,
+          SPEED = 2.6,
+          GOAL_R = 22,
+          SUBSTEPS = 3;
 
-    /* ── 1. Snapshot everything before touching layout ── */
-    const wrapRect = wrap.getBoundingClientRect();
-    const BOARD_W  = wrap.offsetWidth;
-    const BOARD_H  = Math.max(wrap.offsetHeight, 400);
+        /* ── 1. Snapshot everything before touching layout ── */
+        const wrapRect = wrap.getBoundingClientRect();
+        const BOARD_W = wrap.offsetWidth;
+        const BOARD_H = Math.max(wrap.offsetHeight, 400);
 
-    // Chips (collidable + draggable)
-    const chipData = Array.from(document.querySelectorAll('.skill-chip')).map(el => {
-      const r = el.getBoundingClientRect();
-      const x = r.left - wrapRect.left, y = r.top - wrapRect.top;
-      return { el, x, y, w: r.width, h: r.height, origX: x, origY: y, skip: false, flashing: false, cvx: 0, cvy: 0 };
-    });
-
-    // Labels (visible, unmovable, no collision)
-    const labelData = Array.from(document.querySelectorAll('.skills-row-label')).map(el => {
-      const r = el.getBoundingClientRect();
-      return { el, x: r.left - wrapRect.left, y: r.top - wrapRect.top, w: r.width, h: r.height };
-    });
-
-    /* ── 2. Convert to absolute game board ── */
-    wrap.style.position = 'relative';
-    wrap.style.height   = BOARD_H + 'px';
-    wrap.style.overflow = 'hidden';
-
-    document.querySelectorAll('.skills-row').forEach(row => {
-      row.querySelectorAll('.skill-chip').forEach(c => wrap.appendChild(c));
-      const lbl = row.querySelector('.skills-row-label');
-      if (lbl) wrap.appendChild(lbl);
-      row.style.display = 'none';
-    });
-
-    chipData.forEach(d => Object.assign(d.el.style, {
-      position: 'absolute', left: d.x + 'px', top: d.y + 'px',
-      width: d.w + 'px', margin: '0', cursor: 'grab', userSelect: 'none',
-      transition: 'border-color 0.25s, box-shadow 0.25s, background 0.25s',
-    }));
-
-    labelData.forEach(d => Object.assign(d.el.style, {
-      position: 'absolute', left: d.x + 'px', top: d.y + 'px',
-      width: d.w + 'px', margin: '0', borderRight: 'none',
-      cursor: 'default', pointerEvents: 'none', opacity: '0.55',
-    }));
-
-    /* ── 3. Goal ── */
-    const goal = document.createElement('div');
-    goal.className = 'skills-goal';
-    wrap.appendChild(goal);
-    let goalX = 0, goalY = 0, scored = 0, goalLocked = false, ghostUntil = 0;
-
-    function placeGoal() {
-      // Try random positions until one isn't buried inside a chip
-      for (let attempt = 0; attempt < 30; attempt++) {
-        const gx = GOAL_R + 60 + Math.random() * (BOARD_W - GOAL_R * 2 - 120);
-        const gy = GOAL_R + 60 + Math.random() * (BOARD_H - GOAL_R * 2 - 120);
-        const free = chipData.every(d => {
-          const cx = Math.max(d.x, Math.min(gx, d.x + d.w));
-          const cy = Math.max(d.y, Math.min(gy, d.y + d.h));
-          return Math.hypot(gx - cx, gy - cy) > GOAL_R + BALL_R + 8;
+        // Chips (collidable + draggable)
+        const chipData = Array.from(
+          document.querySelectorAll(".skill-chip"),
+        ).map((el) => {
+          const r = el.getBoundingClientRect();
+          const x = r.left - wrapRect.left,
+            y = r.top - wrapRect.top;
+          return {
+            el,
+            x,
+            y,
+            w: r.width,
+            h: r.height,
+            origX: x,
+            origY: y,
+            skip: false,
+            flashing: false,
+            cvx: 0,
+            cvy: 0,
+          };
         });
-        if (free) { goalX = gx; goalY = gy; break; }
-        if (attempt === 29) { goalX = gx; goalY = gy; } // fallback
-      }
-      goal.style.transform = `translate(${goalX - GOAL_R}px, ${goalY - GOAL_R}px)`;
-    }
-    placeGoal();
 
-    /* ── 4. Ball ── */
-    const ball = document.createElement('div');
-    ball.className = 'skills-ball';
-    wrap.appendChild(ball);
-
-    let bx = BALL_R + 30, by = BALL_R + 30;
-    let vx = SPEED * (Math.random() > 0.5 ? 1 : -1);
-    let vy = SPEED * 0.8 * (Math.random() > 0.5 ? 1 : -1);
-
-    /* Find a clear position for the ball (not overlapping any chip) */
-    function findClearBallPos() {
-      const tries = [
-        [BOARD_W * 0.5, BOARD_H * 0.15],
-        [BOARD_W * 0.1, BOARD_H * 0.5],
-        [BOARD_W * 0.9, BOARD_H * 0.5],
-        [BOARD_W * 0.5, BOARD_H * 0.85],
-      ];
-      for (let i = 0; i < 60; i++) {
-        tries.push([
-          BALL_R + 10 + Math.random() * (BOARD_W - BALL_R * 2 - 20),
-          BALL_R + 10 + Math.random() * (BOARD_H - BALL_R * 2 - 20),
-        ]);
-      }
-      for (const [px, py] of tries) {
-        const clear = chipData.every(d => {
-          const cx = Math.max(d.x, Math.min(px, d.x + d.w));
-          const cy = Math.max(d.y, Math.min(py, d.y + d.h));
-          return Math.hypot(px - cx, py - cy) > BALL_R + 8;
+        // Labels (visible, unmovable, no collision)
+        const labelData = Array.from(
+          document.querySelectorAll(".skills-row-label"),
+        ).map((el) => {
+          const r = el.getBoundingClientRect();
+          return {
+            el,
+            x: r.left - wrapRect.left,
+            y: r.top - wrapRect.top,
+            w: r.width,
+            h: r.height,
+          };
         });
-        if (clear) return [px, py];
-      }
-      return [BOARD_W * 0.5, BALL_R + 10];
-    }
 
-    /* Resolve ball vs one chip — mutates bx/by/vx/vy */
-    function resolveChip(d) {
-      if (d.skip || performance.now() < ghostUntil) return;
-      const cx = Math.max(d.x, Math.min(bx, d.x + d.w));
-      const cy = Math.max(d.y, Math.min(by, d.y + d.h));
-      const dx = bx - cx, dy = by - cy;
-      const dist = Math.hypot(dx, dy);
-      if (dist >= BALL_R) return;
+        /* ── 2. Convert to absolute game board ── */
+        wrap.style.position = "relative";
+        wrap.style.height = BOARD_H + "px";
+        wrap.style.overflow = "hidden";
 
-      const nx = dx / (dist || 0.001), ny = dy / (dist || 0.001);
+        document.querySelectorAll(".skills-row").forEach((row) => {
+          row
+            .querySelectorAll(".skill-chip")
+            .forEach((c) => wrap.appendChild(c));
+          const lbl = row.querySelector(".skills-row-label");
+          if (lbl) wrap.appendChild(lbl);
+          row.style.display = "none";
+        });
 
-      // Push ball out
-      bx = cx + nx * (BALL_R + 1.5);
-      by = cy + ny * (BALL_R + 1.5);
+        chipData.forEach((d) =>
+          Object.assign(d.el.style, {
+            position: "absolute",
+            left: d.x + "px",
+            top: d.y + "px",
+            width: d.w + "px",
+            margin: "0",
+            cursor: "grab",
+            userSelect: "none",
+            transition:
+              "border-color 0.25s, box-shadow 0.25s, background 0.25s",
+          }),
+        );
 
-      // Relative velocity of ball w.r.t. chip along the collision normal
-      // relVn < 0  → approaching → apply elastic impulse (moving wall formula)
-      // relVn >= 0 → separating → skip (this naturally prevents sticking)
-      const relVn = (vx - d.cvx) * nx + (vy - d.cvy) * ny;
-      if (relVn < 0) {
-        vx -= 2 * relVn * nx;
-        vy -= 2 * relVn * ny;
+        labelData.forEach((d) =>
+          Object.assign(d.el.style, {
+            position: "absolute",
+            left: d.x + "px",
+            top: d.y + "px",
+            width: d.w + "px",
+            margin: "0",
+            borderRight: "none",
+            cursor: "default",
+            pointerEvents: "none",
+            opacity: "0.55",
+          }),
+        );
 
-        // Clamp: hard hits feel powerful, but cap to avoid chaos
-        const spd = Math.hypot(vx, vy);
-        const MAX = SPEED * 4;
-        if (spd > MAX) { vx = (vx / spd) * MAX; vy = (vy / spd) * MAX; }
-        if (spd < SPEED * 0.6 && spd > 0) { vx = (vx / spd) * SPEED * 0.6; vy = (vy / spd) * SPEED * 0.6; }
-      }
+        /* ── 3. Goal ── */
+        const goal = document.createElement("div");
+        goal.className = "skills-goal";
+        wrap.appendChild(goal);
+        let goalX = 0,
+          goalY = 0,
+          scored = 0,
+          goalLocked = false,
+          ghostUntil = 0;
 
-      if (!d.flashing) {
-        d.flashing = true;
-        d.el.classList.add('hit');
-        setTimeout(() => { d.el.classList.remove('hit'); d.flashing = false; }, 280);
-      }
-    }
+        function placeGoal() {
+          // Try random positions until one isn't buried inside a chip
+          for (let attempt = 0; attempt < 30; attempt++) {
+            const gx =
+              GOAL_R + 60 + Math.random() * (BOARD_W - GOAL_R * 2 - 120);
+            const gy =
+              GOAL_R + 60 + Math.random() * (BOARD_H - GOAL_R * 2 - 120);
+            const free = chipData.every((d) => {
+              const cx = Math.max(d.x, Math.min(gx, d.x + d.w));
+              const cy = Math.max(d.y, Math.min(gy, d.y + d.h));
+              return Math.hypot(gx - cx, gy - cy) > GOAL_R + BALL_R + 8;
+            });
+            if (free) {
+              goalX = gx;
+              goalY = gy;
+              break;
+            }
+            if (attempt === 29) {
+              goalX = gx;
+              goalY = gy;
+            } // fallback
+          }
+          goal.style.transform = `translate(${goalX - GOAL_R}px, ${goalY - GOAL_R}px)`;
+        }
+        placeGoal();
 
-    function physics() {
-      // Sub-step: 3 smaller moves per frame — prevents tunneling through static chips
-      for (let s = 0; s < SUBSTEPS; s++) {
-        bx += vx / SUBSTEPS;
-        by += vy / SUBSTEPS;
+        /* ── 4. Ball ── */
+        const ball = document.createElement("div");
+        ball.className = "skills-ball";
+        wrap.appendChild(ball);
 
-        // Wall bounce
-        if (bx - BALL_R <= 0)       { bx = BALL_R;         vx =  Math.abs(vx); }
-        if (bx + BALL_R >= BOARD_W) { bx = BOARD_W-BALL_R; vx = -Math.abs(vx); }
-        if (by - BALL_R <= 0)       { by = BALL_R;         vy =  Math.abs(vy); }
-        if (by + BALL_R >= BOARD_H) { by = BOARD_H-BALL_R; vy = -Math.abs(vy); }
+        let bx = BALL_R + 30,
+          by = BALL_R + 30;
+        let vx = SPEED * (Math.random() > 0.5 ? 1 : -1);
+        let vy = SPEED * 0.8 * (Math.random() > 0.5 ? 1 : -1);
 
-        chipData.forEach(resolveChip);
-      }
+        /* Find a clear position for the ball (not overlapping any chip) */
+        function findClearBallPos() {
+          const tries = [
+            [BOARD_W * 0.5, BOARD_H * 0.15],
+            [BOARD_W * 0.1, BOARD_H * 0.5],
+            [BOARD_W * 0.9, BOARD_H * 0.5],
+            [BOARD_W * 0.5, BOARD_H * 0.85],
+          ];
+          for (let i = 0; i < 60; i++) {
+            tries.push([
+              BALL_R + 10 + Math.random() * (BOARD_W - BALL_R * 2 - 20),
+              BALL_R + 10 + Math.random() * (BOARD_H - BALL_R * 2 - 20),
+            ]);
+          }
+          for (const [px, py] of tries) {
+            const clear = chipData.every((d) => {
+              const cx = Math.max(d.x, Math.min(px, d.x + d.w));
+              const cy = Math.max(d.y, Math.min(py, d.y + d.h));
+              return Math.hypot(px - cx, py - cy) > BALL_R + 8;
+            });
+            if (clear) return [px, py];
+          }
+          return [BOARD_W * 0.5, BALL_R + 10];
+        }
 
-      // Goal check
-      if (!goalLocked && Math.hypot(bx - goalX, by - goalY) < BALL_R + GOAL_R) {
-        goalLocked = true;
-        scored++;
-        document.getElementById('skills-score').textContent = `${scored} scored`;
-        goal.classList.add('scored');
-        setTimeout(() => {
-          goal.classList.remove('scored');
-          chipData.forEach(d => {
-            d.x = d.origX; d.y = d.origY;
-            d.el.style.left = d.x + 'px';
-            d.el.style.top  = d.y + 'px';
-            d.skip = true;  // each chip activates individually once ball clears it
-          });
-          ghostUntil = performance.now() + 1500;
-          wrap.classList.add('ghosting');
-          placeGoal();
-          goalLocked = false;
-        }, 900);
-      }
-
-      // Chips are passable while ghosted; activate only after ghost timer expires AND ball has cleared
-      const ghostActive = performance.now() < ghostUntil;
-      if (!ghostActive) {
-        let anySkipped = false;
-        chipData.forEach(d => {
-          if (!d.skip) return;
+        /* Resolve ball vs one chip — mutates bx/by/vx/vy */
+        function resolveChip(d) {
+          if (wrap.classList.contains("ghosting")) return;
           const cx = Math.max(d.x, Math.min(bx, d.x + d.w));
           const cy = Math.max(d.y, Math.min(by, d.y + d.h));
-          if (Math.hypot(bx - cx, by - cy) > BALL_R + 6) d.skip = false;
-          else anySkipped = true;
+          const dx = bx - cx,
+            dy = by - cy;
+          const dist = Math.hypot(dx, dy);
+          if (dist >= BALL_R) return;
+
+          const nx = dx / (dist || 0.001),
+            ny = dy / (dist || 0.001);
+
+          // Push ball out
+          bx = cx + nx * (BALL_R + 1.5);
+          by = cy + ny * (BALL_R + 1.5);
+
+          // Relative velocity of ball w.r.t. chip along the collision normal
+          // relVn < 0  → approaching → apply elastic impulse (moving wall formula)
+          // relVn >= 0 → separating → skip (this naturally prevents sticking)
+          const relVn = (vx - d.cvx) * nx + (vy - d.cvy) * ny;
+          if (relVn < 0) {
+            vx -= 2 * relVn * nx;
+            vy -= 2 * relVn * ny;
+
+            // Clamp: hard hits feel powerful, but cap to avoid chaos
+            const spd = Math.hypot(vx, vy);
+            const MAX = SPEED * 4;
+            if (spd > MAX) {
+              vx = (vx / spd) * MAX;
+              vy = (vy / spd) * MAX;
+            }
+            if (spd < SPEED * 0.6 && spd > 0) {
+              vx = (vx / spd) * SPEED * 0.6;
+              vy = (vy / spd) * SPEED * 0.6;
+            }
+          }
+
+          if (!d.flashing) {
+            d.flashing = true;
+            d.el.classList.add("hit");
+            setTimeout(() => {
+              d.el.classList.remove("hit");
+              d.flashing = false;
+            }, 280);
+          }
+        }
+
+        function physics() {
+          // Sub-step: 3 smaller moves per frame — prevents tunneling through static chips
+          for (let s = 0; s < SUBSTEPS; s++) {
+            bx += vx / SUBSTEPS;
+            by += vy / SUBSTEPS;
+
+            // Wall bounce
+            if (bx - BALL_R <= 0) {
+              bx = BALL_R;
+              vx = Math.abs(vx);
+            }
+            if (bx + BALL_R >= BOARD_W) {
+              bx = BOARD_W - BALL_R;
+              vx = -Math.abs(vx);
+            }
+            if (by - BALL_R <= 0) {
+              by = BALL_R;
+              vy = Math.abs(vy);
+            }
+            if (by + BALL_R >= BOARD_H) {
+              by = BOARD_H - BALL_R;
+              vy = -Math.abs(vy);
+            }
+
+            chipData.forEach(resolveChip);
+          }
+
+          // Goal check
+          if (
+            !goalLocked &&
+            Math.hypot(bx - goalX, by - goalY) < BALL_R + GOAL_R
+          ) {
+            goalLocked = true;
+            scored++;
+            document.getElementById("skills-score").textContent =
+              `${scored} scored`;
+            goal.classList.add("scored");
+            setTimeout(() => {
+              goal.classList.remove("scored");
+              chipData.forEach((d) => {
+                d.x = d.origX;
+                d.y = d.origY;
+                d.el.style.left = d.x + "px";
+                d.el.style.top = d.y + "px";
+                d.skip = true; // each chip activates individually once ball clears it
+              });
+              ghostUntil = performance.now() + 1500;
+              wrap.classList.add("ghosting");
+              placeGoal();
+              goalLocked = false;
+            }, 900);
+          }
+
+          // Chips are passable while ghosted; activate only after ghost timer expires AND ball has cleared
+          const ghostActive = performance.now() < ghostUntil;
+          if (!ghostActive) {
+            let anySkipped = false;
+            chipData.forEach((d) => {
+              if (!d.skip) return;
+              const cx = Math.max(d.x, Math.min(bx, d.x + d.w));
+              const cy = Math.max(d.y, Math.min(by, d.y + d.h));
+              if (Math.hypot(bx - cx, by - cy) > BALL_R + 6) d.skip = false;
+              else anySkipped = true;
+            });
+            if (!anySkipped) wrap.classList.remove("ghosting");
+          }
+
+          // Gentle decay back toward base speed after hard hits
+          const curSpd = Math.hypot(vx, vy);
+          if (curSpd > SPEED && curSpd > 0) {
+            const f = 0.997;
+            vx *= f;
+            vy *= f;
+          }
+
+          ball.style.transform = `translate(${bx - BALL_R}px, ${by - BALL_R}px)`;
+          requestAnimationFrame(physics);
+        }
+        requestAnimationFrame(physics);
+
+        /* ── 5. Drag chips ── */
+        let dragging = null;
+
+        chipData.forEach((d) => {
+          function startDrag(clientX, clientY) {
+            dragging = d;
+            const wr = wrap.getBoundingClientRect();
+            d.dragOffX = clientX - wr.left - d.x;
+            d.dragOffY = clientY - wr.top - d.y;
+            d.el.style.cursor = "grabbing";
+            d.el.style.zIndex = "10";
+            d.el.style.transition = "none";
+          }
+          d.el.addEventListener("mousedown", (e) => {
+            e.preventDefault();
+            startDrag(e.clientX, e.clientY);
+          });
+          d.el.addEventListener(
+            "touchstart",
+            (e) => {
+              e.preventDefault();
+              startDrag(e.touches[0].clientX, e.touches[0].clientY);
+            },
+            { passive: false },
+          );
         });
-        if (!anySkipped) wrap.classList.remove('ghosting');
+
+        function onMove(clientX, clientY) {
+          if (!dragging) return;
+          const wr = wrap.getBoundingClientRect();
+          const prevX = dragging.x,
+            prevY = dragging.y;
+          const targX = Math.max(
+            0,
+            Math.min(
+              BOARD_W - dragging.w,
+              clientX - wr.left - dragging.dragOffX,
+            ),
+          );
+          const targY = Math.max(
+            0,
+            Math.min(
+              BOARD_H - dragging.h,
+              clientY - wr.top - dragging.dragOffY,
+            ),
+          );
+
+          // Sweep chip from prev → target in small steps so fast drags can't tunnel
+          const totalDist = Math.hypot(targX - prevX, targY - prevY);
+          const STEP = BALL_R * 0.7; // max px per sub-step
+          const steps = Math.max(1, Math.ceil(totalDist / STEP));
+          let lx = prevX,
+            ly = prevY;
+
+          for (let i = 1; i <= steps; i++) {
+            const t = i / steps;
+            dragging.x = prevX + (targX - prevX) * t;
+            dragging.y = prevY + (targY - prevY) * t;
+            dragging.cvx = dragging.x - lx; // velocity for this sub-step
+            dragging.cvy = dragging.y - ly;
+            lx = dragging.x;
+            ly = dragging.y;
+            resolveChip(dragging);
+          }
+
+          dragging.el.style.left = dragging.x + "px";
+          dragging.el.style.top = dragging.y + "px";
+        }
+        function onUp() {
+          if (!dragging) return;
+          dragging.cvx = 0;
+          dragging.cvy = 0;
+          dragging.el.style.cursor = "grab";
+          dragging.el.style.zIndex = "";
+          dragging.el.style.transition =
+            "border-color 0.25s, box-shadow 0.25s, background 0.25s";
+          dragging = null;
+        }
+
+        document.addEventListener("mousemove", (e) =>
+          onMove(e.clientX, e.clientY),
+        );
+        document.addEventListener("mouseup", onUp);
+        document.addEventListener(
+          "touchmove",
+          (e) => {
+            if (dragging) {
+              e.preventDefault();
+              onMove(e.touches[0].clientX, e.touches[0].clientY);
+            }
+          },
+          { passive: false },
+        );
+        document.addEventListener("touchend", onUp);
+
+        /* ── 6. Reset ── */
+        document
+          .getElementById("skills-reset")
+          ?.addEventListener("click", () => {
+            chipData.forEach((d) => {
+              d.x = d.origX;
+              d.y = d.origY;
+              d.el.style.left = d.x + "px";
+              d.el.style.top = d.y + "px";
+              d.skip = false;
+            });
+            wrap.classList.remove("ghosting");
+            placeGoal();
+          });
       }
 
-      // Gentle decay back toward base speed after hard hits
-      const curSpd = Math.hypot(vx, vy);
-      if (curSpd > SPEED && curSpd > 0) { const f = 0.997; vx *= f; vy *= f; }
-
-      ball.style.transform = `translate(${bx - BALL_R}px, ${by - BALL_R}px)`;
-      requestAnimationFrame(physics);
-    }
-    requestAnimationFrame(physics);
-
-    /* ── 5. Drag chips ── */
-    let dragging = null;
-
-    chipData.forEach(d => {
-      function startDrag(clientX, clientY) {
-        dragging = d;
-        const wr = wrap.getBoundingClientRect();
-        d.dragOffX = clientX - wr.left - d.x;
-        d.dragOffY = clientY - wr.top  - d.y;
-        d.el.style.cursor = 'grabbing';
-        d.el.style.zIndex = '10';
-        d.el.style.transition = 'none';
-      }
-      d.el.addEventListener('mousedown', e => { e.preventDefault(); startDrag(e.clientX, e.clientY); });
-      d.el.addEventListener('touchstart', e => { e.preventDefault(); startDrag(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
-    });
-
-    function onMove(clientX, clientY) {
-      if (!dragging) return;
-      const wr   = wrap.getBoundingClientRect();
-      const prevX = dragging.x, prevY = dragging.y;
-      const targX = Math.max(0, Math.min(BOARD_W - dragging.w, clientX - wr.left - dragging.dragOffX));
-      const targY = Math.max(0, Math.min(BOARD_H - dragging.h, clientY - wr.top  - dragging.dragOffY));
-
-      // Sweep chip from prev → target in small steps so fast drags can't tunnel
-      const totalDist = Math.hypot(targX - prevX, targY - prevY);
-      const STEP = BALL_R * 0.7;                         // max px per sub-step
-      const steps = Math.max(1, Math.ceil(totalDist / STEP));
-      let lx = prevX, ly = prevY;
-
-      for (let i = 1; i <= steps; i++) {
-        const t = i / steps;
-        dragging.x = prevX + (targX - prevX) * t;
-        dragging.y = prevY + (targY - prevY) * t;
-        dragging.cvx = dragging.x - lx;               // velocity for this sub-step
-        dragging.cvy = dragging.y - ly;
-        lx = dragging.x; ly = dragging.y;
-        resolveChip(dragging);
-      }
-
-      dragging.el.style.left = dragging.x + 'px';
-      dragging.el.style.top  = dragging.y + 'px';
-    }
-    function onUp() {
-      if (!dragging) return;
-      dragging.cvx = 0; dragging.cvy = 0;
-      dragging.el.style.cursor = 'grab';
-      dragging.el.style.zIndex = '';
-      dragging.el.style.transition = 'border-color 0.25s, box-shadow 0.25s, background 0.25s';
-      dragging = null;
-    }
-
-    document.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
-    document.addEventListener('mouseup', onUp);
-    document.addEventListener('touchmove', e => { if (dragging) { e.preventDefault(); onMove(e.touches[0].clientX, e.touches[0].clientY); } }, { passive: false });
-    document.addEventListener('touchend', onUp);
-
-    /* ── 6. Reset ── */
-    document.getElementById('skills-reset')?.addEventListener('click', () => {
-      chipData.forEach(d => {
-        d.x = d.origX; d.y = d.origY;
-        d.el.style.left = d.x + 'px';
-        d.el.style.top  = d.y + 'px';
-        d.skip = false;
-      });
-      wrap.classList.remove('ghosting');
-      placeGoal();
-    });
-  }
-
-  /* ═══════════════════════════════════════════════════════════════════
+      /* ═══════════════════════════════════════════════════════════════════
      EXPERIENCE TABS
   ═══════════════════════════════════════════════════════════════════ */
 
-  function setupExpTabs() {
-    const tabs    = document.querySelectorAll('.exp-tab');
-    const details = document.querySelectorAll('.exp-detail');
+      function setupExpTabs() {
+        const tabs = document.querySelectorAll(".exp-tab");
+        const details = document.querySelectorAll(".exp-detail");
 
-    function activate(index) {
-      tabs.forEach(t => t.classList.remove('active'));
-      details.forEach(d => d.classList.remove('active'));
-      tabs[index].classList.add('active');
-      details[index].classList.add('active');
-    }
+        function activate(index) {
+          tabs.forEach((t) => t.classList.remove("active"));
+          details.forEach((d) => d.classList.remove("active"));
+          tabs[index].classList.add("active");
+          details[index].classList.add("active");
+        }
 
-    tabs.forEach((tab, i) => {
-      tab.addEventListener('click', () => activate(i));
-      tab.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(i); }
-        if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); activate((i + 1) % tabs.length); tabs[(i + 1) % tabs.length].focus(); }
-        if (e.key === 'ArrowUp'   || e.key === 'ArrowLeft')  { e.preventDefault(); activate((i - 1 + tabs.length) % tabs.length); tabs[(i - 1 + tabs.length) % tabs.length].focus(); }
-      });
-    });
-  }
+        tabs.forEach((tab, i) => {
+          tab.addEventListener("click", () => activate(i));
+          tab.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              activate(i);
+            }
+            if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+              e.preventDefault();
+              activate((i + 1) % tabs.length);
+              tabs[(i + 1) % tabs.length].focus();
+            }
+            if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+              e.preventDefault();
+              activate((i - 1 + tabs.length) % tabs.length);
+              tabs[(i - 1 + tabs.length) % tabs.length].focus();
+            }
+          });
+        });
+      }
 
-  /* ── INIT ────────────────────────────────────────── */
+      /* ── INIT ────────────────────────────────────────── */
 
-  renderCards();
-  setupCards();
-  setupExpTabs();
-  setupSkillsAnimation();
-  setupScrollAnimations();
-  </script>
-
-</body>
+      renderCards();
+      setupCards();
+      setupExpTabs();
+      setupSkillsAnimation();
+      setupScrollAnimations();
+    </script>
+  </body>
 </html>
