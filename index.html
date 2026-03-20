@@ -495,19 +495,83 @@
       padding: 0.875rem 1.375rem;
     }
 
+    /* Game controls row */
+    .skills-game-controls {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+    .skills-game-hint {
+      font-family: var(--mono); font-size: 0.6375rem;
+      letter-spacing: 0.08em; color: var(--text-muted);
+    }
+    .skills-reset-btn {
+      font-family: var(--mono); font-size: 0.6375rem; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 0.3rem 0.875rem;
+      border: 1px solid var(--border); background: none; color: var(--text-muted);
+      cursor: pointer; transition: color 0.2s, border-color 0.2s;
+    }
+    .skills-reset-btn:hover { color: var(--mono-color); border-color: var(--mono-color); }
+
+    /* Game board */
+    .skills-rows {
+      background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    /* Skill chips */
     .skill-chip {
       display: inline-flex; align-items: center;
       padding: 0.375rem 0.875rem;
       border: 1px solid var(--border-2);
       font-size: 0.875rem; color: var(--text-primary);
-      white-space: nowrap; letter-spacing: 0.01em; cursor: default;
-      transition: border-color 1.4s ease, box-shadow 1.4s ease, background 1.4s ease;
+      white-space: nowrap; letter-spacing: 0.01em;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+      box-sizing: border-box;
     }
-    .skill-chip.lit {
+    .skill-chip.hit {
       border-color: var(--mono-color);
-      background: color-mix(in srgb, var(--mono-color) 7%, transparent);
-      box-shadow: 0 0 14px -4px color-mix(in srgb, var(--mono-color) 35%, transparent);
+      background: color-mix(in srgb, var(--mono-color) 10%, transparent);
+      box-shadow: 0 0 16px -2px color-mix(in srgb, var(--mono-color) 50%, transparent);
     }
+    /* Grace period after goal — chips fade out, ball phases through */
+    .skills-rows.ghosting .skill-chip {
+      opacity: 0.15;
+      transition: opacity 0.5s ease !important;
+    }
+    .skills-rows .skill-chip {
+      transition: opacity 0.5s ease, border-color 0.25s, box-shadow 0.25s, background 0.25s;
+    }
+
+    /* Ball */
+    .skills-ball {
+      position: absolute; width: 12px; height: 12px;
+      border-radius: 50%; background: var(--mono-color);
+      box-shadow: 0 0 18px 5px color-mix(in srgb, var(--mono-color) 65%, transparent);
+      pointer-events: none; z-index: 6;
+    }
+
+    /* Goal */
+    .skills-goal {
+      position: absolute; width: 44px; height: 44px; border-radius: 50%;
+      border: 1.5px solid var(--mono-color); pointer-events: none; z-index: 4;
+      animation: goal-pulse 1.6s ease-in-out infinite;
+    }
+    .skills-goal::after {
+      content: ''; position: absolute; inset: 5px; border-radius: 50%;
+      background: color-mix(in srgb, var(--mono-color) 18%, transparent);
+    }
+    @keyframes goal-pulse {
+      0%, 100% { box-shadow: 0 0 0 0   color-mix(in srgb, var(--mono-color) 50%, transparent); }
+      50%       { box-shadow: 0 0 0 10px color-mix(in srgb, var(--mono-color) 0%,  transparent); }
+    }
+    .skills-goal.scored {
+      animation: none;
+      background: color-mix(in srgb, var(--mono-color) 35%, transparent);
+      box-shadow: 0 0 40px 12px color-mix(in srgb, var(--mono-color) 70%, transparent);
+    }
+
+    /* Score counter */
+    #skills-score { color: var(--mono-color); }
 
     /* ── CONTACT ─────────────────────────────────────── */
 
@@ -737,6 +801,10 @@
   <section id="skills">
     <div class="container">
       <p class="section-label">03 — Skills &amp; Tools</p>
+      <div class="skills-game-controls">
+        <span class="skills-game-hint">drag chips · guide ball to the target &nbsp;·&nbsp; <span id="skills-score">0 scored</span></span>
+        <button class="skills-reset-btn" id="skills-reset">↺ Reset</button>
+      </div>
     </div>
 
     <div class="container"><div class="skills-rows">
@@ -1200,48 +1268,274 @@ Explain the concept, the design decisions, what you implemented and how, any int
   }
 
   /* ═══════════════════════════════════════════════════════════════════
-     SKILLS — random chip highlight loop
+     SKILLS — bouncing ball puzzle game
   ═══════════════════════════════════════════════════════════════════ */
 
   function setupSkillsAnimation() {
-    // Build a weighted chip pool — chips in high-priority rows appear more often
-    const HIGH  = ['Engines', 'Code', 'Technical Design'];
-    const chipData = [];
+    const wrap = document.querySelector('.skills-rows');
+    if (!wrap) return;
 
-    document.querySelectorAll('.skills-row').forEach(row => {
-      const label    = row.querySelector('.skills-row-label')?.textContent.trim() ?? '';
-      const weight   = HIGH.includes(label) ? 4 : 1;
-      row.querySelectorAll('.skill-chip').forEach(chip => {
-        for (let w = 0; w < weight; w++) chipData.push(chip);
-      });
+    const BALL_R = 6, SPEED = 2.6, GOAL_R = 22, SUBSTEPS = 3;
+
+    /* ── 1. Snapshot everything before touching layout ── */
+    const wrapRect = wrap.getBoundingClientRect();
+    const BOARD_W  = wrap.offsetWidth;
+    const BOARD_H  = Math.max(wrap.offsetHeight, 400);
+
+    // Chips (collidable + draggable)
+    const chipData = Array.from(document.querySelectorAll('.skill-chip')).map(el => {
+      const r = el.getBoundingClientRect();
+      const x = r.left - wrapRect.left, y = r.top - wrapRect.top;
+      return { el, x, y, w: r.width, h: r.height, origX: x, origY: y, skip: false, flashing: false, cvx: 0, cvy: 0 };
     });
 
-    if (!chipData.length) return;
+    // Labels (visible, unmovable, no collision)
+    const labelData = Array.from(document.querySelectorAll('.skills-row-label')).map(el => {
+      const r = el.getBoundingClientRect();
+      return { el, x: r.left - wrapRect.left, y: r.top - wrapRect.top, w: r.width, h: r.height };
+    });
 
-    const active = new Set();
+    /* ── 2. Convert to absolute game board ── */
+    wrap.style.position = 'relative';
+    wrap.style.height   = BOARD_H + 'px';
+    wrap.style.overflow = 'hidden';
 
-    function lightOne() {
-      // Pick a random chip from the weighted pool that isn't already lit
-      const available = chipData.filter(c => !active.has(c));
-      if (!available.length) { setTimeout(lightOne, 800); return; }
+    document.querySelectorAll('.skills-row').forEach(row => {
+      row.querySelectorAll('.skill-chip').forEach(c => wrap.appendChild(c));
+      const lbl = row.querySelector('.skills-row-label');
+      if (lbl) wrap.appendChild(lbl);
+      row.style.display = 'none';
+    });
 
-      const chip = available[Math.floor(Math.random() * available.length)];
-      active.add(chip);
-      chip.classList.add('lit');
+    chipData.forEach(d => Object.assign(d.el.style, {
+      position: 'absolute', left: d.x + 'px', top: d.y + 'px',
+      width: d.w + 'px', margin: '0', cursor: 'grab', userSelect: 'none',
+      transition: 'border-color 0.25s, box-shadow 0.25s, background 0.25s',
+    }));
 
-      // Keep it lit for 2.5–4s, then fade out
-      const life = 2500 + Math.random() * 1500;
-      setTimeout(() => {
-        chip.classList.remove('lit');
-        active.delete(chip);
-      }, life);
+    labelData.forEach(d => Object.assign(d.el.style, {
+      position: 'absolute', left: d.x + 'px', top: d.y + 'px',
+      width: d.w + 'px', margin: '0', borderRight: 'none',
+      cursor: 'default', pointerEvents: 'none', opacity: '0.55',
+    }));
 
-      // Keep up to 4–5 chips lit at a time
-      const gap = active.size < 5 ? 400 + Math.random() * 400 : 1200 + Math.random() * 800;
-      setTimeout(lightOne, gap);
+    /* ── 3. Goal ── */
+    const goal = document.createElement('div');
+    goal.className = 'skills-goal';
+    wrap.appendChild(goal);
+    let goalX = 0, goalY = 0, scored = 0, goalLocked = false;
+
+    function placeGoal() {
+      // Try random positions until one isn't buried inside a chip
+      for (let attempt = 0; attempt < 30; attempt++) {
+        const gx = GOAL_R + 60 + Math.random() * (BOARD_W - GOAL_R * 2 - 120);
+        const gy = GOAL_R + 60 + Math.random() * (BOARD_H - GOAL_R * 2 - 120);
+        const free = chipData.every(d => {
+          const cx = Math.max(d.x, Math.min(gx, d.x + d.w));
+          const cy = Math.max(d.y, Math.min(gy, d.y + d.h));
+          return Math.hypot(gx - cx, gy - cy) > GOAL_R + BALL_R + 8;
+        });
+        if (free) { goalX = gx; goalY = gy; break; }
+        if (attempt === 29) { goalX = gx; goalY = gy; } // fallback
+      }
+      goal.style.transform = `translate(${goalX - GOAL_R}px, ${goalY - GOAL_R}px)`;
+    }
+    placeGoal();
+
+    /* ── 4. Ball ── */
+    const ball = document.createElement('div');
+    ball.className = 'skills-ball';
+    wrap.appendChild(ball);
+
+    let bx = BALL_R + 30, by = BALL_R + 30;
+    let vx = SPEED * (Math.random() > 0.5 ? 1 : -1);
+    let vy = SPEED * 0.8 * (Math.random() > 0.5 ? 1 : -1);
+
+    /* Find a clear position for the ball (not overlapping any chip) */
+    function findClearBallPos() {
+      const tries = [
+        [BOARD_W * 0.5, BOARD_H * 0.15],
+        [BOARD_W * 0.1, BOARD_H * 0.5],
+        [BOARD_W * 0.9, BOARD_H * 0.5],
+        [BOARD_W * 0.5, BOARD_H * 0.85],
+      ];
+      for (let i = 0; i < 60; i++) {
+        tries.push([
+          BALL_R + 10 + Math.random() * (BOARD_W - BALL_R * 2 - 20),
+          BALL_R + 10 + Math.random() * (BOARD_H - BALL_R * 2 - 20),
+        ]);
+      }
+      for (const [px, py] of tries) {
+        const clear = chipData.every(d => {
+          const cx = Math.max(d.x, Math.min(px, d.x + d.w));
+          const cy = Math.max(d.y, Math.min(py, d.y + d.h));
+          return Math.hypot(px - cx, py - cy) > BALL_R + 8;
+        });
+        if (clear) return [px, py];
+      }
+      return [BOARD_W * 0.5, BALL_R + 10];
     }
 
-    setTimeout(lightOne, 800);
+    /* Resolve ball vs one chip — mutates bx/by/vx/vy */
+    function resolveChip(d) {
+      if (d.skip) return;
+      const cx = Math.max(d.x, Math.min(bx, d.x + d.w));
+      const cy = Math.max(d.y, Math.min(by, d.y + d.h));
+      const dx = bx - cx, dy = by - cy;
+      const dist = Math.hypot(dx, dy);
+      if (dist >= BALL_R) return;
+
+      const nx = dx / (dist || 0.001), ny = dy / (dist || 0.001);
+
+      // Push ball out
+      bx = cx + nx * (BALL_R + 1.5);
+      by = cy + ny * (BALL_R + 1.5);
+
+      // Relative velocity of ball w.r.t. chip along the collision normal
+      // relVn < 0  → approaching → apply elastic impulse (moving wall formula)
+      // relVn >= 0 → separating → skip (this naturally prevents sticking)
+      const relVn = (vx - d.cvx) * nx + (vy - d.cvy) * ny;
+      if (relVn < 0) {
+        vx -= 2 * relVn * nx;
+        vy -= 2 * relVn * ny;
+
+        // Clamp: hard hits feel powerful, but cap to avoid chaos
+        const spd = Math.hypot(vx, vy);
+        const MAX = SPEED * 4;
+        if (spd > MAX) { vx = (vx / spd) * MAX; vy = (vy / spd) * MAX; }
+        if (spd < SPEED * 0.6 && spd > 0) { vx = (vx / spd) * SPEED * 0.6; vy = (vy / spd) * SPEED * 0.6; }
+      }
+
+      if (!d.flashing) {
+        d.flashing = true;
+        d.el.classList.add('hit');
+        setTimeout(() => { d.el.classList.remove('hit'); d.flashing = false; }, 280);
+      }
+    }
+
+    function physics() {
+      // Sub-step: 3 smaller moves per frame — prevents tunneling through static chips
+      for (let s = 0; s < SUBSTEPS; s++) {
+        bx += vx / SUBSTEPS;
+        by += vy / SUBSTEPS;
+
+        // Wall bounce
+        if (bx - BALL_R <= 0)       { bx = BALL_R;         vx =  Math.abs(vx); }
+        if (bx + BALL_R >= BOARD_W) { bx = BOARD_W-BALL_R; vx = -Math.abs(vx); }
+        if (by - BALL_R <= 0)       { by = BALL_R;         vy =  Math.abs(vy); }
+        if (by + BALL_R >= BOARD_H) { by = BOARD_H-BALL_R; vy = -Math.abs(vy); }
+
+        chipData.forEach(resolveChip);
+      }
+
+      // Goal check
+      if (!goalLocked && Math.hypot(bx - goalX, by - goalY) < BALL_R + GOAL_R) {
+        goalLocked = true;
+        scored++;
+        document.getElementById('skills-score').textContent = `${scored} scored`;
+        goal.classList.add('scored');
+        setTimeout(() => {
+          goal.classList.remove('scored');
+          chipData.forEach(d => {
+            d.x = d.origX; d.y = d.origY;
+            d.el.style.left = d.x + 'px';
+            d.el.style.top  = d.y + 'px';
+            d.skip = true;
+          });
+          // Move ball to a clear spot in the reset layout
+          const [nbx, nby] = findClearBallPos();
+          bx = nbx; by = nby;
+          vx = SPEED * (Math.random() > 0.5 ? 1 : -1);
+          vy = SPEED * 0.8 * (Math.random() > 0.5 ? 1 : -1);
+          wrap.classList.add('ghosting');
+          setTimeout(() => {
+            wrap.classList.remove('ghosting');
+            chipData.forEach(d => { d.skip = false; });
+          }, 1500);
+          placeGoal();
+          goalLocked = false;
+        }, 900);
+      }
+
+      // Gentle decay back toward base speed after hard hits
+      const curSpd = Math.hypot(vx, vy);
+      if (curSpd > SPEED && curSpd > 0) { const f = 0.997; vx *= f; vy *= f; }
+
+      ball.style.transform = `translate(${bx - BALL_R}px, ${by - BALL_R}px)`;
+      requestAnimationFrame(physics);
+    }
+    requestAnimationFrame(physics);
+
+    /* ── 5. Drag chips ── */
+    let dragging = null;
+
+    chipData.forEach(d => {
+      function startDrag(clientX, clientY) {
+        dragging = d;
+        const wr = wrap.getBoundingClientRect();
+        d.dragOffX = clientX - wr.left - d.x;
+        d.dragOffY = clientY - wr.top  - d.y;
+        d.el.style.cursor = 'grabbing';
+        d.el.style.zIndex = '10';
+        d.el.style.transition = 'none';
+      }
+      d.el.addEventListener('mousedown', e => { e.preventDefault(); startDrag(e.clientX, e.clientY); });
+      d.el.addEventListener('touchstart', e => { e.preventDefault(); startDrag(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+    });
+
+    function onMove(clientX, clientY) {
+      if (!dragging) return;
+      const wr   = wrap.getBoundingClientRect();
+      const prevX = dragging.x, prevY = dragging.y;
+      const targX = Math.max(0, Math.min(BOARD_W - dragging.w, clientX - wr.left - dragging.dragOffX));
+      const targY = Math.max(0, Math.min(BOARD_H - dragging.h, clientY - wr.top  - dragging.dragOffY));
+
+      // Sweep chip from prev → target in small steps so fast drags can't tunnel
+      const totalDist = Math.hypot(targX - prevX, targY - prevY);
+      const STEP = BALL_R * 0.7;                         // max px per sub-step
+      const steps = Math.max(1, Math.ceil(totalDist / STEP));
+      let lx = prevX, ly = prevY;
+
+      for (let i = 1; i <= steps; i++) {
+        const t = i / steps;
+        dragging.x = prevX + (targX - prevX) * t;
+        dragging.y = prevY + (targY - prevY) * t;
+        dragging.cvx = dragging.x - lx;               // velocity for this sub-step
+        dragging.cvy = dragging.y - ly;
+        lx = dragging.x; ly = dragging.y;
+        resolveChip(dragging);
+      }
+
+      dragging.el.style.left = dragging.x + 'px';
+      dragging.el.style.top  = dragging.y + 'px';
+    }
+    function onUp() {
+      if (!dragging) return;
+      dragging.cvx = 0; dragging.cvy = 0;
+      dragging.el.style.cursor = 'grab';
+      dragging.el.style.zIndex = '';
+      dragging.el.style.transition = 'border-color 0.25s, box-shadow 0.25s, background 0.25s';
+      dragging = null;
+    }
+
+    document.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
+    document.addEventListener('mouseup', onUp);
+    document.addEventListener('touchmove', e => { if (dragging) { e.preventDefault(); onMove(e.touches[0].clientX, e.touches[0].clientY); } }, { passive: false });
+    document.addEventListener('touchend', onUp);
+
+    /* ── 6. Reset ── */
+    document.getElementById('skills-reset')?.addEventListener('click', () => {
+      chipData.forEach(d => {
+        d.x = d.origX; d.y = d.origY;
+        d.el.style.left = d.x + 'px';
+        d.el.style.top  = d.y + 'px';
+        d.skip = false;
+      });
+      wrap.classList.remove('ghosting');
+      scored = 0;
+      document.getElementById('skills-score').textContent = '0 scored';
+      placeGoal();
+    });
   }
 
   /* ═══════════════════════════════════════════════════════════════════
