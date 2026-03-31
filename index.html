@@ -172,7 +172,7 @@
       .hero-name {
         font-size: clamp(2rem, 4.5vw, 3.5rem);
         font-weight: 400;
-        line-height: 1.0;
+        line-height: 1;
         letter-spacing: -0.02em;
         color: var(--text-primary);
         margin-bottom: 0.4rem;
@@ -269,7 +269,7 @@
 
       .projects-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
         gap: 1px;
         background: var(--border);
         outline: 1px solid var(--border);
@@ -401,70 +401,136 @@
 
       /* Card body */
       .card-body {
-        padding: 1rem 1.375rem 1.25rem;
+        padding: 1rem 1.25rem 1.125rem;
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.375rem;
+        flex: 1;
+      }
+
+      /* Title row: name left, year right */
+      .card-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 0.1rem;
       }
 
       .project-title {
-        font-size: 1.125rem;
+        font-size: 1rem;
         font-weight: 500;
         color: var(--text-primary);
         letter-spacing: -0.01em;
         line-height: 1.25;
-        margin-bottom: 0;
         transition: color 0.2s;
+      }
+
+      .card-year {
+        font-family: var(--mono);
+        font-size: 0.6rem;
+        letter-spacing: 0.1em;
+        color: var(--text-muted);
+        white-space: nowrap;
+        flex-shrink: 0;
+        transition: color 0.2s;
+      }
+      .project-card:hover .card-year {
+        color: var(--text-secondary);
       }
 
       .project-type {
         font-family: var(--mono);
-        font-size: 0.6875rem;
-        color: var(--accent);
+        font-size: 0.625rem;
+        color: var(--mono-color);
         letter-spacing: 0.08em;
         text-transform: uppercase;
-        margin-bottom: 0;
       }
 
-      .project-desc {
-        display: none;
+      .card-role-wrap {
+        margin-top: 0.35rem;
+      }
+      .card-role-label {
+        display: block;
+        font-family: var(--mono);
+        font-size: 0.58rem;
+        letter-spacing: 0.07em;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        margin-bottom: 0.2rem;
+        transition: color 0.2s;
+      }
+      .card-role {
+        font-size: 0.72rem;
+        color: var(--text-secondary);
+        line-height: 1.45;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        transition: color 0.2s;
+      }
+      .project-card:hover .card-role-label {
+        color: var(--text-secondary);
+      }
+      .project-card:hover .card-role {
+        color: var(--text-primary);
       }
 
-      .project-tags {
+      /* 1–2 line description teaser */
+      .card-brief {
+        font-size: 0.8125rem;
+        color: var(--text-secondary);
+        line-height: 1.55;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-top: 0.2rem;
+        transition: color 0.2s;
+      }
+      .project-card:hover .card-brief {
+        color: var(--text-primary);
+      }
+
+      /* Framed tag pills */
+      .card-tags-line {
         display: flex;
         flex-wrap: wrap;
         gap: 0.35rem;
-        margin-bottom: 0;
+        margin-top: auto;
+        padding-top: 0.55rem;
       }
 
-      .tag {
+      .card-tag {
+        display: inline-flex;
+        align-items: center;
         font-family: var(--mono);
-        font-size: 0.6875rem;
-        letter-spacing: 0.04em;
-        color: var(--mono-color);
-        border: 1px solid var(--border-2);
-        padding: 0.25rem 0.625rem;
-      }
-
-      .card-cta {
-        align-self: flex-start;
-        font-family: var(--mono);
-        font-size: 0.6875rem;
+        font-size: 0.65rem;
         letter-spacing: 0.06em;
-        text-transform: uppercase;
         color: var(--mono-color);
-        background: none;
-        border: none;
-        border-bottom: 1px solid var(--border-2);
-        padding: 0 0 1px;
-        cursor: pointer;
+        padding: 0.3rem 0.55rem;
+        border: 1px solid
+          color-mix(in srgb, var(--mono-color) 45%, var(--border-2));
+        background: color-mix(in srgb, var(--mono-color) 6%, transparent);
         transition:
           color 0.2s,
-          border-color 0.2s;
+          border-color 0.2s,
+          background 0.2s,
+          box-shadow 0.2s;
+        box-shadow: 0 0 14px -4px
+          color-mix(in srgb, var(--mono-color) 25%, transparent);
       }
-      .project-card:hover .card-cta {
-        color: var(--text-primary);
-        border-color: var(--text-secondary);
+      .project-card:hover .card-tag {
+        color: color-mix(in srgb, var(--mono-color) 82%, #fff);
+        border-color: color-mix(
+          in srgb,
+          var(--mono-color) 65%,
+          var(--border-2)
+        );
+        background: color-mix(in srgb, var(--mono-color) 12%, transparent);
+        box-shadow: 0 0 18px -2px
+          color-mix(in srgb, var(--mono-color) 40%, transparent);
       }
 
       /* ── MODAL ────────────────────────────────────────── */
@@ -579,6 +645,27 @@
         color: var(--accent);
         letter-spacing: 0.1em;
         text-transform: uppercase;
+        margin-bottom: 0.65rem;
+      }
+
+      .modal-role {
+        font-size: 0.9375rem;
+        color: var(--text-secondary);
+        line-height: 1.55;
+        max-width: 42rem;
+      }
+      .modal-role::before {
+        content: "My role · ";
+        font-family: var(--mono);
+        font-size: 0.65rem;
+        letter-spacing: 0.08em;
+        color: var(--mono-color);
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 0.35rem;
+      }
+      .modal-role:empty {
+        display: none;
       }
 
       .modal-rule {
@@ -985,7 +1072,8 @@
         position: absolute;
         inset: -8px;
         border-radius: 50%;
-        border: 1px dashed color-mix(in srgb, var(--mono-color) 30%, transparent);
+        border: 1px dashed
+          color-mix(in srgb, var(--mono-color) 30%, transparent);
         animation: hole-orbit 3s linear infinite;
       }
       /* Inward-sucking pulse ring */
@@ -998,12 +1086,22 @@
         animation: hole-suck 1.4s ease-in infinite;
       }
       @keyframes hole-orbit {
-        to { transform: rotate(360deg); }
+        to {
+          transform: rotate(360deg);
+        }
       }
       @keyframes hole-suck {
-        0%   { transform: scale(3.2); opacity: 0; }
-        10%  { opacity: 1; }
-        100% { transform: scale(0.3); opacity: 0; }
+        0% {
+          transform: scale(3.2);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        100% {
+          transform: scale(0.3);
+          opacity: 0;
+        }
       }
       .skills-goal.scored {
         animation: none;
@@ -1028,11 +1126,22 @@
 
       /* Chip wiggle hint */
       @keyframes chip-wiggle {
-        0%, 100% { transform: translateX(0) rotate(0deg); }
-        20%  { transform: translateX(-3px) rotate(-1deg); }
-        40%  { transform: translateX(3px) rotate(1deg); }
-        60%  { transform: translateX(-2px) rotate(-0.5deg); }
-        80%  { transform: translateX(2px) rotate(0.5deg); }
+        0%,
+        100% {
+          transform: translateX(0) rotate(0deg);
+        }
+        20% {
+          transform: translateX(-3px) rotate(-1deg);
+        }
+        40% {
+          transform: translateX(3px) rotate(1deg);
+        }
+        60% {
+          transform: translateX(-2px) rotate(-0.5deg);
+        }
+        80% {
+          transform: translateX(2px) rotate(0.5deg);
+        }
       }
       .skill-chip.wiggle {
         animation: chip-wiggle 0.65s ease-in-out both;
@@ -1053,7 +1162,9 @@
         animation: skills-intro-show 0.4s ease 0.3s forwards;
       }
       @keyframes skills-intro-show {
-        to { opacity: 1; }
+        to {
+          opacity: 1;
+        }
       }
       .skills-intro.dismissed {
         animation: none !important;
@@ -1081,8 +1192,12 @@
         animation: intro-icon-nudge 1s ease-in-out infinite alternate;
       }
       @keyframes intro-icon-nudge {
-        from { transform: translateX(-5px); }
-        to   { transform: translateX(5px); }
+        from {
+          transform: translateX(-5px);
+        }
+        to {
+          transform: translateX(5px);
+        }
       }
       .skills-intro-title {
         font-family: var(--mono);
@@ -1195,9 +1310,6 @@
         section {
           padding: 5rem 0;
         }
-        .projects-grid {
-          grid-template-columns: 1fr 1fr;
-        }
         .exp-panel {
           flex-direction: column;
         }
@@ -1303,16 +1415,23 @@
       <!-- Full-width showreel video -->
       <div class="hero-reel">
         <!--
-          REPLACE WITH YOUR VIDEO:
-          <video class="hero-reel-video" src="showreel.mp4" autoplay muted loop playsinline></video>
-          Then remove the canvas element below.
+          REPLACE WITH YOUR OWN VIDEO:
+          Swap showreel.mp4 for your actual montage file.
         -->
-        <canvas id="hero-reel-canvas" class="hero-reel-video"></canvas>
+        <video
+          class="hero-reel-video"
+          src="showreel.mp4"
+          autoplay
+          muted
+          loop
+          playsinline
+        ></video>
         <div class="hero-reel-overlay"></div>
         <div class="container hero-reel-text">
           <h1 class="hero-name">Ekaterina<br />Chukina</h1>
           <p class="hero-title">
-            Technical Designer <span class="amp">&amp;</span> Gameplay Programmer
+            Technical Designer <span class="amp">&amp;</span> Gameplay
+            Programmer
           </p>
         </div>
       </div>
@@ -1321,7 +1440,9 @@
       <div class="hero-strip">
         <div class="container hero-strip-inner">
           <div>
-            <p class="hero-eyebrow">Prague, CZ &nbsp;·&nbsp; Open to opportunities</p>
+            <p class="hero-eyebrow">
+              Prague, CZ &nbsp;·&nbsp; Open to opportunities
+            </p>
             <p class="hero-bio">
               I build gameplay systems that ship. Focused on the intersection of
               design and code — from enemy AI and weapon frameworks to
@@ -1330,9 +1451,23 @@
             </p>
           </div>
           <div class="hero-links">
-            <a href="mailto:chukina.eka@gmail.com" class="btn-primary">Get in touch</a>
-            <a href="https://github.com/" target="_blank" rel="noopener" class="btn-ghost">GitHub ↗</a>
-            <a href="https://linkedin.com/" target="_blank" rel="noopener" class="btn-ghost">LinkedIn ↗</a>
+            <a href="mailto:chukina.eka@gmail.com" class="btn-primary"
+              >Get in touch</a
+            >
+            <a
+              href="https://github.com/"
+              target="_blank"
+              rel="noopener"
+              class="btn-ghost"
+              >GitHub ↗</a
+            >
+            <a
+              href="https://linkedin.com/"
+              target="_blank"
+              rel="noopener"
+              class="btn-ghost"
+              >LinkedIn ↗</a
+            >
           </div>
         </div>
       </div>
@@ -1357,6 +1492,7 @@
           <p class="modal-num" id="modal-num"></p>
           <h2 class="modal-title" id="modal-title"></h2>
           <p class="modal-type" id="modal-type"></p>
+          <p class="modal-role" id="modal-role"></p>
         </div>
         <div class="modal-rule"></div>
         <div class="modal-videos" id="modal-videos"></div>
@@ -1479,7 +1615,8 @@
         <p class="section-label">03 — Skills &amp; Tools</p>
         <div class="skills-game-controls">
           <span class="skills-game-hint"
-            ><strong>↔ drag the skills</strong> &nbsp;·&nbsp; guide the ball into the hole &nbsp;·&nbsp;
+            ><strong>↔ drag the skills</strong> &nbsp;·&nbsp; guide the ball
+            into the hole &nbsp;·&nbsp;
             <span id="skills-score">0 scored</span></span
           >
           <button class="skills-reset-btn" id="skills-reset">↺ Reset</button>
@@ -1595,6 +1732,7 @@
        num        — display number, e.g. "001"
        title      — project name
        type       — short type label shown in accent color
+       role       — your title / responsibility (shown on card + modal — keep scannable)
        shortDesc  — 1–2 sentence summary shown on the card
        fullDesc   — full description shown in the modal (plain text, newlines respected)
        tags       — array of technology / context tags
@@ -1617,6 +1755,7 @@
           num: "001",
           title: "Strand Forge — Action Prototype",
           type: "Gameplay Prototype · Ongoing",
+          role: "Technical Designer & Gameplay Programmer — owned weapons, shooting loop & enemy AI (Strand Forge, co-dev with Bohemia Interactive).",
           shortDesc:
             "Fast-paced action prototype: weapon framework, multi-type shooting loop, and enemy AI archetypes with state-based behaviors.",
           fullDesc: `Built at Strand Forge as technical designer and gameplay programmer, co-developing with Bohemia Interactive.
@@ -1666,6 +1805,7 @@ Working in a multi-developer Git workflow throughout.`,
           num: "002",
           title: "Bohemia Interactive — Designer Tools",
           type: "Authoring Tools · Shipped",
+          role: "Junior Technical Designer — built designer-facing quiz & dialogue modules and data-driven authoring pipelines shipped across multiple scenarios.",
           shortDesc:
             "Reusable gameplay modules and data-driven authoring pipelines built with proprietary Unity-based visual scripting; shipped across 4 released scenarios.",
           fullDesc: `Built during my year at Bohemia Interactive as Junior Technical Designer.
@@ -1707,6 +1847,7 @@ The videos below show the tools and scripted mechanics in action — lesson walk
           num: "003",
           title: "Balcony",
           type: "Narrative Game · Solo",
+          role: "Solo developer — design, programming, and narrative systems (Godot).",
           shortDesc:
             "Short narrative game with state-based narration and multiple endings driven by player choices.",
           fullDesc: `Short narrative game built solo in Godot 4.1.
@@ -1742,6 +1883,7 @@ The game features multiple distinct endings driven entirely by accumulated playe
           num: "004",
           title: "VR App for Lying Patients",
           type: "VR Application · Bachelor Thesis",
+          role: "Bachelor thesis — extended existing Unity VR app; designed & implemented two mini-games, tutorials, and interactions; tested with real patients.",
           shortDesc:
             "Extended a Unity VR application; designed two original mini-games with audio tutorials, tested with real patients.",
           fullDesc: `Extended and refactored an existing Unity VR application for Meta Quest 3, designed specifically for patients who cannot sit or stand.
@@ -1780,6 +1922,7 @@ The application was tested iteratively with real users — feedback directly sha
           num: "005",
           title: "[Indie Minigame I]",
           type: "Indie Game",
+          role: "[Your role — e.g. Solo developer, or team role + what you owned.]",
           shortDesc:
             "[Short description — core mechanic, what makes it fun, what you are proud of.]",
           fullDesc: `[Longer description for the modal.
@@ -1803,6 +1946,7 @@ Explain the concept, the design decisions, what you implemented and how, any int
           num: "006",
           title: "[Indie Minigame II]",
           type: "Indie Game",
+          role: "[Your role — e.g. Solo developer, or team role + what you owned.]",
           shortDesc:
             "[Short description — core mechanic, what makes it fun, what you are proud of.]",
           fullDesc: `[Longer description for the modal.
@@ -1848,7 +1992,6 @@ Explain the concept, the design decisions, what you implemented and how, any int
             ? `<img class="card-poster" src="${thumb}" alt="${p.title} preview" loading="lazy">`
             : "";
 
-          // Local mp4 fallback (only used if no YouTube embed)
           const videoEl =
             v0.src && !ytId
               ? `<video class="card-video" src="${v0.src}"
@@ -1856,9 +1999,20 @@ Explain the concept, the design decisions, what you implemented and how, any int
              muted loop playsinline preload="none"></video>`
               : "";
 
+          // Separate year tag (e.g. "2025", "2024–2025") from tech tags
+          const yearTag = p.tags.find((t) => /\d{4}/.test(t)) || "";
+          const techTags = p.tags.filter((t) => !/\d{4}/.test(t)).slice(0, 3);
+          const tagsHtml = techTags.length
+            ? `<div class="card-tags-line" aria-label="Technologies">${techTags.map((t) => `<span class="card-tag">${t}</span>`).join("")}</div>`
+            : "";
+
+          const roleHtml = p.role
+            ? `<div class="card-role-wrap"><span class="card-role-label">My role</span><p class="card-role">${p.role}</p></div>`
+            : "";
+
           return `
         <div class="project-card fade-up" data-index="${i}" data-ytid="${ytId || ""}"
-             style="transition-delay: ${(i % 3) * 80}ms"
+             style="transition-delay: ${(i % 2) * 80}ms"
              role="button" tabindex="0" aria-label="Open ${p.title}">
           <div class="card-thumb">
             <div class="card-thumb-bg"></div>
@@ -1871,12 +2025,14 @@ Explain the concept, the design decisions, what you implemented and how, any int
             <span class="card-thumb-num">${p.num}</span>
           </div>
           <div class="card-body">
-            <h3 class="project-title">${p.title}</h3>
-            <p class="project-type">${p.type}</p>
-            <div class="project-tags">
-              ${p.tags.map((t) => `<span class="tag">${t}</span>`).join("")}
+            <div class="card-header">
+              <h3 class="project-title">${p.title}</h3>
+              ${yearTag ? `<span class="card-year">${yearTag}</span>` : ""}
             </div>
-            <button class="card-cta">View project →</button>
+            <p class="project-type">${p.type}</p>
+            ${roleHtml}
+            <p class="card-brief">${p.shortDesc}</p>
+            ${tagsHtml}
           </div>
         </div>`;
         }).join("");
@@ -1893,6 +2049,7 @@ Explain the concept, the design decisions, what you implemented and how, any int
         document.getElementById("modal-num").textContent = p.num;
         document.getElementById("modal-title").textContent = p.title;
         document.getElementById("modal-type").textContent = p.type;
+        document.getElementById("modal-role").textContent = p.role || "";
         document.getElementById("modal-desc").textContent = p.fullDesc;
 
         document.getElementById("modal-tags").innerHTML = p.tags
@@ -2173,10 +2330,13 @@ Explain the concept, the design decisions, what you implemented and how, any int
           .sort(() => Math.random() - 0.5)
           .slice(0, 8);
         wiggleSet.forEach((d, i) => {
-          setTimeout(() => {
-            d.el.classList.add("wiggle");
-            setTimeout(() => d.el.classList.remove("wiggle"), 700);
-          }, 500 + i * 200);
+          setTimeout(
+            () => {
+              d.el.classList.add("wiggle");
+              setTimeout(() => d.el.classList.remove("wiggle"), 700);
+            },
+            500 + i * 200,
+          );
         });
 
         /* ── 3. Goal ── */
@@ -2305,7 +2465,7 @@ Explain the concept, the design decisions, what you implemented and how, any int
           const SUCK_RANGE = GOAL_R * 14;
           if (!goalLocked && dg < SUCK_RANGE && dg > 0) {
             const t = 1 - dg / SUCK_RANGE; // 0 at edge → 1 at center
-            const force = 1.6 * t * t * t;  // cubic: gentle far, aggressive near
+            const force = 1.6 * t * t * t; // cubic: gentle far, aggressive near
             vx += ((goalX - bx) / dg) * force;
             vy += ((goalY - by) / dg) * force;
           }
@@ -2396,7 +2556,10 @@ Explain the concept, the design decisions, what you implemented and how, any int
           const distGoal = Math.hypot(bx - goalX, by - goalY);
           const approachScale = goalLocked
             ? 0
-            : Math.min(1, Math.max(0, (distGoal - GOAL_R * 0.2) / (GOAL_R * 1.8)));
+            : Math.min(
+                1,
+                Math.max(0, (distGoal - GOAL_R * 0.2) / (GOAL_R * 1.8)),
+              );
           let spawnScale = 1;
           if (ballSpawnStart > 0) {
             const t = Math.min(1, (performance.now() - ballSpawnStart) / 500);
@@ -2568,136 +2731,8 @@ Explain the concept, the design decisions, what you implemented and how, any int
         });
       }
 
-      /* ── HERO CANVAS — placeholder animation ─────────── */
-
-      function setupHeroCanvas() {
-        const canvas = document.getElementById('hero-reel-canvas');
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-
-        const C      = 'rgba(122,174,196,';   // brand blue base
-        const BG     = '#0b0d11';
-        const GRID   = 32;
-
-        function resize() {
-          canvas.width  = canvas.offsetWidth;
-          canvas.height = canvas.offsetHeight;
-        }
-        resize();
-        window.addEventListener('resize', () => { resize(); buildParticles(); });
-
-        /* ── Particles ── */
-        let particles = [];
-        function buildParticles() {
-          const area  = canvas.width * canvas.height;
-          const count = Math.round(area / 9000);          // density-scaled
-          particles = Array.from({ length: count }, () => ({
-            x:  Math.random() * canvas.width,
-            y:  Math.random() * canvas.height,
-            vx: (Math.random() - 0.5) * 0.55,
-            vy: (Math.random() - 0.5) * 0.55,
-            r:  Math.random() * 2 + 0.8,
-            a:  Math.random() * 0.5 + 0.25,
-            // larger "node" entities (game objects)
-            big: Math.random() < 0.08,
-          }));
-        }
-        buildParticles();
-
-        /* ── Scanlines ── */
-        let scanY = 0;
-
-        function draw() {
-          const W = canvas.width, H = canvas.height;
-
-          // Background
-          ctx.fillStyle = BG;
-          ctx.fillRect(0, 0, W, H);
-
-          // Dot grid
-          ctx.fillStyle = 'rgba(62,66,73,0.55)';
-          for (let x = GRID; x < W; x += GRID)
-            for (let y = GRID; y < H; y += GRID) {
-              ctx.beginPath();
-              ctx.arc(x, y, 0.9, 0, Math.PI * 2);
-              ctx.fill();
-            }
-
-          // Connection lines between nearby particles
-          for (let i = 0; i < particles.length; i++) {
-            const a = particles[i];
-            for (let j = i + 1; j < particles.length; j++) {
-              const b   = particles[j];
-              const dx  = a.x - b.x, dy = a.y - b.y;
-              const d   = Math.sqrt(dx * dx + dy * dy);
-              const MAX = 130;
-              if (d < MAX) {
-                ctx.beginPath();
-                ctx.moveTo(a.x, a.y);
-                ctx.lineTo(b.x, b.y);
-                ctx.strokeStyle = C + ((1 - d / MAX) * 0.12) + ')';
-                ctx.lineWidth   = 0.6;
-                ctx.stroke();
-              }
-            }
-          }
-
-          // Particles
-          for (const p of particles) {
-            p.x += p.vx;
-            p.y += p.vy;
-            if (p.x < 0 || p.x > W) p.vx *= -1;
-            if (p.y < 0 || p.y > H) p.vy *= -1;
-
-            const r = p.big ? p.r * 3.5 : p.r;
-
-            // Glow halo
-            const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 5);
-            grd.addColorStop(0, C + (p.a * 0.7) + ')');
-            grd.addColorStop(1, C + '0)');
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, r * 5, 0, Math.PI * 2);
-            ctx.fillStyle = grd;
-            ctx.fill();
-
-            // Core dot
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-            ctx.fillStyle = C + Math.min(p.a + 0.4, 1) + ')';
-            ctx.fill();
-
-            // Big node: diamond wireframe
-            if (p.big) {
-              const s = r * 2.2;
-              ctx.beginPath();
-              ctx.moveTo(p.x, p.y - s);
-              ctx.lineTo(p.x + s, p.y);
-              ctx.lineTo(p.x, p.y + s);
-              ctx.lineTo(p.x - s, p.y);
-              ctx.closePath();
-              ctx.strokeStyle = C + (p.a * 0.55) + ')';
-              ctx.lineWidth   = 0.8;
-              ctx.stroke();
-            }
-          }
-
-          // Slow scanline sweep
-          scanY = (scanY + 0.4) % H;
-          const sg = ctx.createLinearGradient(0, scanY - 40, 0, scanY + 40);
-          sg.addColorStop(0,   'rgba(122,174,196,0)');
-          sg.addColorStop(0.5, 'rgba(122,174,196,0.04)');
-          sg.addColorStop(1,   'rgba(122,174,196,0)');
-          ctx.fillStyle = sg;
-          ctx.fillRect(0, scanY - 40, W, 80);
-
-          requestAnimationFrame(draw);
-        }
-        draw();
-      }
-
       /* ── INIT ────────────────────────────────────────── */
 
-      setupHeroCanvas();
       renderCards();
       setupCards();
       setupExpTabs();
